@@ -47,7 +47,21 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _saveHiddenFields() async {
-    await _profilController.updateHiddenFields(context, hiddenFields);
+    try {
+      await _profilController.updateHiddenFields(context, hiddenFields);
+      // Setelah berhasil, redirect ke halaman profil
+      if (context.mounted) {
+        GoRouter.of(context).go('/profil');
+      }
+    } catch (error) {
+      // Tampilkan pesan kesalahan jika terjadi error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyimpan data: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

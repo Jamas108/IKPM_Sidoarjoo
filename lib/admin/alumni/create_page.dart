@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:ikpm_sidoarjo/controllers/admin/alumni_controller.dart';
 
 class AddAlumniPage extends StatefulWidget {
@@ -27,39 +25,49 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
   final TextEditingController _instansiController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _isSubmitting = false;
+
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      final alumniData = {
-        'nama': _namaController.text,
-        'stambuk': _stambukController.text,
-        'tahun': _tahunController.text,
-        'kampus_asal': _kampusController.text,
-        'alamat': _alamatController.text,
-        'no_telepon': _noTeleponController.text,
-        'pasangan': _pasanganController.text,
-        'pekerjaan': _pekerjaanController.text,
-        'nama_laqob': _namaLaqobController.text,
-        'ttl': _ttlController.text,
-        'kecamatan': _kecamatanController.text,
-        'instansi': _instansiController.text,
-        'password': _passwordController.text,
-        'role_id': 2, // Default value
-      };
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-        final isSuccess = await _alumniController.createAlumni(alumniData);
+    setState(() {
+      _isSubmitting = true;
+    });
 
-        if (isSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data alumni berhasil ditambahkan!')),
-          );
-          Navigator.pop(context);
-        }
-      } catch (e) {
+    final alumniData = {
+      'nama': _namaController.text,
+      'stambuk': _stambukController.text,
+      'tahun': _tahunController.text,
+      'kampus_asal': _kampusController.text,
+      'alamat': _alamatController.text,
+      'no_telepon': _noTeleponController.text,
+      'pasangan': _pasanganController.text,
+      'pekerjaan': _pekerjaanController.text,
+      'nama_laqob': _namaLaqobController.text,
+      'ttl': _ttlController.text,
+      'kecamatan': _kecamatanController.text,
+      'instansi': _instansiController.text,
+      'password': _passwordController.text,
+      'role_id': 2,
+    };
+
+    try {
+      final isSuccess = await _alumniController.createAlumni(alumniData);
+
+      if (isSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal menambahkan data: $e')),
+          const SnackBar(content: Text('Data alumni berhasil ditambahkan!')),
         );
+        Navigator.pop(context);
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menambahkan data: $e')),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 
@@ -71,7 +79,10 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
         backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(color: Colors.white),
         titleTextStyle: const TextStyle(
-            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       body: Container(
         color: const Color(0xFFF6F7FB),
@@ -108,6 +119,16 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
                     controller: _tahunController,
                     label: 'Tahun Lulus',
                     isRequired: true,
+                    inputType: TextInputType.number, // Hanya angka
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tahun Lulus wajib diisi';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'Tahun Lulus harus berupa angka';
+                      }
+                      return null;
+                    },
                   ),
                   _buildTextField(
                     controller: _kampusController,
@@ -123,6 +144,16 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
                     controller: _noTeleponController,
                     label: 'No. Telepon',
                     isRequired: true,
+                    inputType: TextInputType.phone, // Input type untuk telepon
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'No. Telepon wajib diisi';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'No. Telepon harus berupa angka';
+                      }
+                      return null;
+                    },
                   ),
                   _buildTextField(
                     controller: _pasanganController,
@@ -162,7 +193,7 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: _submitForm,
+                    onPressed: _isSubmitting ? null : _submitForm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 23, 114, 110),
                       padding: const EdgeInsets.symmetric(vertical: 14.0),
@@ -170,10 +201,20 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text(
-                      'Simpan',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Simpan',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                   ),
                 ],
               ),
@@ -189,11 +230,14 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
     required String label,
     bool isRequired = false,
     bool obscureText = false,
+    TextInputType? inputType,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextFormField(
         controller: controller,
+        keyboardType: inputType,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.black),
@@ -205,12 +249,13 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
           ),
         ),
         obscureText: obscureText,
-        validator: (value) {
-          if (isRequired && (value == null || value.isEmpty)) {
-            return '$label wajib diisi';
-          }
-          return null;
-        },
+        validator: validator ??
+            (value) {
+              if (isRequired && (value == null || value.isEmpty)) {
+                return '$label wajib diisi';
+              }
+              return null;
+            },
       ),
     );
   }

@@ -22,6 +22,7 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
 
   Uint8List? _selectedImage;
   String? _selectedImageName;
+  bool _isLoading = false;
 
   Future<void> _pickImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -81,6 +82,10 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
       return;
     }
 
+    setState(() {
+      _isLoading = true; // Aktifkan indikator loading
+    });
+
     try {
       await _informasiController.addInformasi(
         title: title,
@@ -110,6 +115,10 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saat menyimpan informasi: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Matikan indikator loading
+      });
     }
   }
 
@@ -194,11 +203,7 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saveInformasi,
-                      child: const Text(
-                        'Simpan Informasi',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
+                      onPressed: _isLoading ? null : _saveInformasi,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2C7566),
                         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -206,8 +211,18 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : const Text(
+                              'Simpan Informasi',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

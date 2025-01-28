@@ -115,6 +115,7 @@ class KritikPage extends StatelessWidget {
                                   style: TextStyle(color: Colors.white),
                                 ),
                         ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),

@@ -253,7 +253,7 @@ class _InformasiDataSource extends DataTableSource {
       DataCell(Text(informasi.date)),
       DataCell(Text(informasi.time)),
       DataCell(Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           IconButton(
             icon: const Icon(Icons.visibility, color: Color.fromARGB(255, 255, 170, 0)),

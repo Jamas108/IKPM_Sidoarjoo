@@ -47,14 +47,15 @@ class ProfilController {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hidden fields berhasil diperbarui')),
+          const SnackBar(content: Text('Berhasil menyembunyikan data')),
         );
       } else {
         throw Exception('Failed to update hidden fields');
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal memperbarui hidden fields')),
+        const SnackBar(
+            content: Text('Gagal memperbarui data yang disembunyikan')),
       );
       debugPrint('Error updating hidden fields: $error');
     }
@@ -73,8 +74,8 @@ class ProfilController {
     }
 
     try {
-      final response =
-          await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
+      final response = await http.get(
+          Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
@@ -124,13 +125,15 @@ class ProfilController {
       rethrow;
     }
   }
-   Future<void> savePassword(BuildContext context, String newPassword) async {
+
+  Future<void> savePassword(BuildContext context, String newPassword) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final stambuk = authProvider.userStambuk;
 
     if (stambuk == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stambuk tidak ditemukan! Silakan login ulang.')),
+        const SnackBar(
+            content: Text('Stambuk tidak ditemukan! Silakan login ulang.')),
       );
       throw Exception('Stambuk tidak ditemukan');
     }
@@ -157,5 +160,79 @@ class ProfilController {
     }
   }
 
-  
+  Future<List<Map<String, dynamic>>> fetchKritikByStambuk(
+      BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final stambuk = authProvider.userStambuk;
+
+    if (stambuk == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Stambuk tidak ditemukan! Silakan login ulang.')),
+      );
+      throw Exception('Stambuk tidak ditemukan');
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('https://backend-ikpmsidoarjo.vercel.app/kritik/$stambuk'),
+      );
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(json.decode(response.body));
+      } else {
+        throw Exception('Gagal memuat riwayat kritik');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> editKritik(
+      BuildContext context, String kritikId, String updatedKritik) async {
+    try {
+      final response = await http.put(
+        Uri.parse('https://backend-ikpmsidoarjo.vercel.app/kritik/$kritikId'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'kritik': updatedKritik}),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kritik berhasil diperbarui')),
+        );
+      } else {
+        throw Exception('Gagal memperbarui kritik');
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal memperbarui kritik')),
+      );
+      debugPrint('Error updating kritik: $error');
+    }
+  }
+
+  Future<void> deleteKritik(BuildContext context, String kritikId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('https://backend-ikpmsidoarjo.vercel.app/kritik/$kritikId'),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kritik berhasil dihapus')),
+        );
+      } else {
+        throw Exception('Gagal menghapus kritik');
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menghapus kritik')),
+      );
+      debugPrint('Error deleting kritik: $error');
+    }
+  }
 }

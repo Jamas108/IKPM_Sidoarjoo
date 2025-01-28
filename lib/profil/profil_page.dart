@@ -54,6 +54,8 @@ class _ProfilPageState extends State<ProfilPage> {
                             _buildSettingsButton(context),
                             const SizedBox(height: 16), // Spasi antara tombol
                             _buildHistoryEventButton(context),
+                            const SizedBox(height: 16),
+                            _buildHistoryKritikButton(context),
                             const SizedBox(height: 16), // Spasi antara tombol
                             _buildEditProfileButton(context),
                             const SizedBox(height: 16),
@@ -291,6 +293,32 @@ class _ProfilPageState extends State<ProfilPage> {
           ),
           child: const Text(
             'Riwayat Kegiatan',
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryKritikButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            GoRouter.of(context)
+                .go('/riwayat-kritik'); // Navigasi ke RiwayatEventPage
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          child: const Text(
+            'Riwayat Kritik dan Saran',
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
           ),

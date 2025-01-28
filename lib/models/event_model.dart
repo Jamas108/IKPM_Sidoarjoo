@@ -5,6 +5,7 @@ class EventModel {
   final String name;
   final String date;
   final String time;
+  final String status;
   final String location;
   final String description;
   final String poster;
@@ -14,6 +15,7 @@ class EventModel {
     required this.name,
     required this.date,
     required this.time,
+    required this.status,
     required this.location,
     required this.description,
     required this.poster,
@@ -32,6 +34,7 @@ class EventModel {
       name: json['name'] ?? 'Unknown Event',
       date: json['date'] ?? '2023-01-01',
       time: json['time'] ?? '00:00',
+      status: json['status'] ?? 'Uknown Status',
       location: json['location'] ?? 'Unknown Location',
       description: json['description'] ?? 'No description available.',
       poster: '$posterPath', // Gabungkan baseUrl dengan nama file

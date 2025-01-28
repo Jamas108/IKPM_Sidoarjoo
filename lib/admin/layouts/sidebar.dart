@@ -31,7 +31,7 @@ class AdminSidebarLayout extends StatelessWidget {
                 color: Colors.white), // Ikon logout putih
             onPressed: () async {
               await authProvider.logout();
-              context.go('/login');
+              context.go('/');
             },
           ),
         ],

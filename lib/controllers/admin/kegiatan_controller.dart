@@ -49,6 +49,7 @@ class EventController {
     required String name,
     required String date,
     required String time,
+    required String status,
     required String location,
     required String description,
     Uint8List? imageBytes,
@@ -59,6 +60,7 @@ class EventController {
     request.fields['name'] = name;
     request.fields['date'] = date;
     request.fields['time'] = time;
+    request.fields['status'] = status;
     request.fields['location'] = location;
     request.fields['description'] = description;
 
@@ -85,16 +87,19 @@ class EventController {
     required String name,
     required String date,
     required String time,
+    required String status,
     required String location,
     required String description,
     Uint8List? imageBytes,
     String? imageName,
   }) async {
-    var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/$kegiatanId'));
+    var request =
+        http.MultipartRequest('PUT', Uri.parse('$baseUrl/$kegiatanId'));
 
     request.fields['name'] = name;
     request.fields['date'] = date;
     request.fields['time'] = time;
+    request.fields['status'] = status;
     request.fields['location'] = location;
     request.fields['description'] = description;
 

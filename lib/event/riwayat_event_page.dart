@@ -103,19 +103,7 @@ class _RiwayatEventPageState extends State<RiwayatEventPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Halo, ${authProvider.userNama ?? "Pengguna"}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Berikut adalah daftar event yang Anda ikuti:',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 10),
                       ListView.builder(
                         shrinkWrap:
                             true, // Pastikan ListView tidak memenuhi layar

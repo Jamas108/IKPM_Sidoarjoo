@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../layouts/navbar_layout.dart';
 import '../layouts/bottom_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -103,7 +104,11 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            context.go('/login'); // Arahkan ke halaman login
+                            // Arahkan ke tautan YouTube
+                            const url =
+                                'https://www.youtube.com/@ikpmsidoarjo496/videos';
+                            launchUrl(Uri.parse(
+                                url)); // Menggunakan launchUrl dari package url_launcher
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFFFFFF),
@@ -114,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(30.0),
                             ),
                           ),
-                          child: const Text("Login"),
+                          child: const Text("Dokumentasi"),
                         ),
                         const SizedBox(width: 16),
                       ],
@@ -314,43 +319,43 @@ class _FeatureCardState extends State<_FeatureCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          _isHovering = true;
-        });
-      },
-      onExit: (_) {
-        setState(() {
-          _isHovering = false;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        transform: _isHovering
-            ? Matrix4.identity()
-                .scaled(1.02) // Gunakan scaled() alih-alih chaining
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 255, 248, 255),
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(
-            color: const Color.fromARGB(255, 43, 117, 101),
-            width: 2,
+    return GestureDetector(
+      onTap: widget.onTap, // Aksi yang terjadi ketika card ditekan
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            _isHovering = true;
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            _isHovering = false;
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          transform: _isHovering
+              ? Matrix4.identity()
+                  .scaled(1.02) // Gunakan scaled() untuk efek hover
+              : Matrix4.identity(),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 255, 248, 255),
+            borderRadius: BorderRadius.circular(16.0),
+            border: Border.all(
+              color: const Color.fromARGB(255, 43, 117, 101),
+              width: 2,
+            ),
+            boxShadow: _isHovering
+                ? [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : [],
           ),
-          boxShadow: _isHovering
-              ? [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : [],
-        ),
-        child: GestureDetector(
-          onTap: widget.onTap,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

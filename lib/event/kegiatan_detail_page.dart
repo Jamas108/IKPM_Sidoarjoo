@@ -145,6 +145,35 @@ class DetailEvent extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today, color: Colors.blueGrey),
+                      const SizedBox(width: 8),
+                      Text(
+                        event.date, // Tanggal dari EventModel
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black87),
+                      ),
+                      const SizedBox(width: 8),
+                      // Badge status
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(event.status),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          event.status,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -199,11 +228,15 @@ class DetailEvent extends StatelessWidget {
             // Tombol daftar
             Center(
               child: ElevatedButton(
-                onPressed: () => _registerForEvent(context),
+                onPressed: (event.status == 'Selesai' ||
+                        event.status == 'Berjalan')
+                    ? null // Disable tombol jika status "Selesai" atau "Berjalan"
+                    : () => _registerForEvent(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: stambuk != null
-                      ? const Color.fromARGB(255, 23, 114, 110)
-                      : Colors.orange,
+                  backgroundColor:
+                      (event.status == 'Selesai' || event.status == 'Berjalan')
+                          ? Colors.grey // Warna tombol jika dinonaktifkan
+                          : const Color.fromARGB(255, 23, 114, 110),
                   padding:
                       const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
                   shape: RoundedRectangleBorder(
@@ -211,7 +244,11 @@ class DetailEvent extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  stambuk != null ? 'Daftar Acara' : 'Login untuk Mendaftar',
+                  (event.status == 'Selesai' || event.status == 'Berjalan')
+                      ? 'Daftar Kegiatan' // Teks jika tombol dinonaktifkan
+                      : stambuk != null
+                          ? 'Daftar Acara'
+                          : 'Login untuk Mendaftar',
                   style: const TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
@@ -233,5 +270,18 @@ class DetailEvent extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+Color _getStatusColor(String status) {
+  switch (status) {
+    case 'Berjalan':
+      return Colors.green;
+    case 'Selesai':
+      return Colors.blue;
+    case 'Akan Datang':
+      return Colors.orange;
+    default:
+      return Colors.grey;
   }
 }

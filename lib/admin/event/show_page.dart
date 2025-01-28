@@ -49,15 +49,20 @@ class ShowEventPage extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: 20),
-                    _buildDetailField('Nama Event', event.name),
+
+                    // STATUS DENGAN BADGE BERWARNA
+                    _buildStatusBadge(event.status),
                     const SizedBox(height: 16),
-                    _buildDetailField('Tanggal Event', event.date),
+
+                    _buildDetailField('Nama Kegiatan', event.name),
                     const SizedBox(height: 16),
-                    _buildDetailField('Waktu Event', event.time),
+                    _buildDetailField('Tanggal Kegiatan', event.date),
                     const SizedBox(height: 16),
-                    _buildDetailField('Lokasi Event', event.location),
+                    _buildDetailField('Waktu Kegiatan', event.time),
                     const SizedBox(height: 16),
-                    _buildDetailField('Deskripsi Event', event.description,
+                    _buildDetailField('Lokasi Kegiatan', event.location),
+                    const SizedBox(height: 16),
+                    _buildDetailField('Deskripsi Kegiatan', event.description,
                         maxLines: 3),
                   ],
                 ),
@@ -69,6 +74,49 @@ class ShowEventPage extends StatelessWidget {
     );
   }
 
+  // BADGE STATUS BERWARNA
+  Widget _buildStatusBadge(String status) {
+    Color bgColor;
+    String statusText;
+
+    switch (status) {
+      case 'Berjalan':
+        bgColor = Colors.green;
+        statusText = 'Berjalan';
+        break;
+      case 'Selesai':
+        bgColor = Colors.blue;
+        statusText = 'Selesai';
+        break;
+      case 'Akan Datang':
+        bgColor = Colors.orange;
+        statusText = 'Akan Datang';
+        break;
+      case 'Disembunyikan':
+        bgColor = Colors.red;
+        statusText = 'Disembunyikan';
+        break;
+      default:
+        bgColor = Colors.grey;
+        statusText = 'Tidak Diketahui';
+    }
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          statusText,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  // FIELD DETAIL
   Widget _buildDetailField(String label, String value, {int maxLines = 1}) {
     return TextFormField(
       initialValue: value,

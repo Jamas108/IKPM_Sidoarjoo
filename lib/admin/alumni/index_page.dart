@@ -92,12 +92,12 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
               child: const Text('Batal'),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red,),
               onPressed: () {
                 Navigator.of(context).pop(); // Tutup dialog
                 _deleteAlumni(stambuk); // Panggil fungsi hapus
               },
-              child: const Text('Hapus'),
+              child: const Text('Hapus', style: TextStyle(color: Colors.white),),
             ),
           ],
         );
@@ -181,6 +181,7 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return AdminSidebarLayout(
       child: _isLoading
@@ -249,7 +250,7 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Filter Tahun"),
+                            hint: const Text("Tahun"),
                             value: _selectedYear,
                             onChanged: (value) {
                               setState(() {
@@ -264,7 +265,7 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                                 .map((tahun) {
                               return DropdownMenuItem<String>(
                                 value: tahun,
-                                child: Text(tahun ?? '-'),
+                                child: Text(tahun ?? 'Filter Tahun'),
                               );
                             }).toList(),
                           ),
@@ -288,31 +289,7 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                                 .map((kampus) {
                               return DropdownMenuItem<String>(
                                 value: kampus,
-                                child: Text(kampus ?? '-'),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            hint: const Text("Filter Tahun"),
-                            value: _selectedYear,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedYear = value;
-                              });
-                              _filterAlumni();
-                            },
-                            items: _alumniList
-                                .map((alumni) => alumni.tahun)
-                                .toSet()
-                                .toList()
-                                .map((tahun) {
-                              return DropdownMenuItem<String>(
-                                value: tahun,
-                                child: Text(tahun ?? '-'),
+                                child: Text(kampus ?? 'Asal Kampus'),
                               );
                             }).toList(),
                           ),
@@ -336,36 +313,51 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Data Table
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width,
+                    // Data Table or Empty Message
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: PaginatedDataTable(
-                        header: const Text('Data Alumni'),
-                        columns: const [
-                          DataColumn(label: Text('No')),
-                          DataColumn(label: Text('Nama')),
-                          DataColumn(label: Text('Stambuk')),
-                          DataColumn(label: Text('Kampus')),
-                          DataColumn(label: Text('Aksi')),
-                        ],
-                        source: _AlumniDataSource(
-                          _filteredAlumniList,
-                          context,
-                          _showDeleteConfirmation,
-                          _PasswordVerification, // Callback hapus
-                        ),
-                        rowsPerPage: _rowsPerPage,
-                        availableRowsPerPage: const [5, 10, 15],
-                        onRowsPerPageChanged: (value) {
-                          setState(() {
-                            _rowsPerPage = value ?? 5;
-                          });
-                        },
-                        columnSpacing: 16.0,
-                        horizontalMargin: 16.0,
-                        showCheckboxColumn: false,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _filteredAlumniList.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  "Data alumni tidak ditemukan.",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              )
+                            : PaginatedDataTable(
+                                header: const Text('Data Alumni'),
+                                columns: const [
+                                  DataColumn(label: Text('No')),
+                                  DataColumn(label: Text('Nama')),
+                                  DataColumn(label: Text('Stambuk')),
+                                  DataColumn(label: Text('Kampus')),
+                                  DataColumn(label: Text('Aksi')),
+                                ],
+                                source: _AlumniDataSource(
+                                  _filteredAlumniList,
+                                  context,
+                                  _showDeleteConfirmation,
+                                  _PasswordVerification,
+                                ),
+                                rowsPerPage: _rowsPerPage,
+                                availableRowsPerPage: const [5, 10, 15],
+                                onRowsPerPageChanged: (value) {
+                                  setState(() {
+                                    _rowsPerPage = value ?? 5;
+                                  });
+                                },
+                                columnSpacing: 16.0,
+                                horizontalMargin: 16.0,
+                                showCheckboxColumn: false,
+                              ),
                       ),
                     ),
                   ],

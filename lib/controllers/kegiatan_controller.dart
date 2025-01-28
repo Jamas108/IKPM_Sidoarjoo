@@ -22,25 +22,27 @@ class EventController {
     }
   }
 
- Future<List<EventModel>> fetchKegiatan() async {
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
+Future<List<EventModel>> fetchKegiatan() async {
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
 
-        // Konversi JSON menjadi list EventModel
-        _cachedEventList =
-            jsonData.map((event) => EventModel.fromJson(event)).toList();
-        return _cachedEventList;
-      } else {
-        throw Exception(
-            'Failed to load events. Status Code: ${response.statusCode}');
-      }
-    } catch (error) {
-      throw Exception('Error fetching events: $error');
+      // Filter kegiatan dengan status "Disembunyikan"
+      _cachedEventList = jsonData
+          .map((event) => EventModel.fromJson(event))
+          .where((event) => event.status != 'Disembunyikan')
+          .toList();
+      return _cachedEventList;
+    } else {
+      throw Exception(
+          'Failed to load events. Status Code: ${response.statusCode}');
     }
+  } catch (error) {
+    throw Exception('Error fetching events: $error');
   }
+}
 
   Future<EventModel> fetchEventById(String id) async {
     try {

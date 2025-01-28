@@ -258,6 +258,24 @@ class _EventPageState extends State<EventPage> {
                       color: Colors.teal,
                     ),
                   ),
+                  const SizedBox(height: 6),
+                  // Badge status
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(event.status),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      event.status,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
@@ -288,5 +306,21 @@ class _EventPageState extends State<EventPage> {
         ),
       ),
     );
+  }
+}
+
+// Fungsi untuk mendapatkan warna status
+Color _getStatusColor(String status) {
+  switch (status) {
+    case 'Berjalan':
+      return Colors.green;
+    case 'Selesai':
+      return Colors.blue;
+    case 'Akan Datang':
+      return Colors.orange;
+    case 'Disembunyikan':
+      return Colors.red;
+    default:
+      return Colors.grey;
   }
 }

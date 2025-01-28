@@ -12,6 +12,7 @@ import 'package:ikpm_sidoarjo/admin/profil/index_page.dart';
 import 'package:ikpm_sidoarjo/alumni/detail_alumni_page.dart';
 import 'package:ikpm_sidoarjo/controllers/kritik_controller.dart';
 import 'package:ikpm_sidoarjo/controllers/login_controller.dart';
+import 'package:ikpm_sidoarjo/kritik/riwayat_kritik_page.dart';
 import 'package:ikpm_sidoarjo/profil/edit_password_page.dart';
 import 'package:ikpm_sidoarjo/profil/edit_profil_page.dart';
 import 'package:provider/provider.dart';
@@ -239,7 +240,7 @@ final GoRouter _router = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/event',
+      path: '/kegiatan',
       builder: (context, state) => const EventPage(),
       routes: [
         GoRoute(
@@ -277,6 +278,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/riwayat-event',
       builder: (context, state) => const RiwayatEventPage(),
+    ),
+    GoRoute(
+      path: '/riwayat-kritik',
+      builder: (context, state) => const RiwayatKritikPage(),
     ),
     GoRoute(
       path: '/alumni',

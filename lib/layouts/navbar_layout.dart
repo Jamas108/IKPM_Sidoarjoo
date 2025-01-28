@@ -64,7 +64,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                 const Spacer(),
                 _navbarItem(context, 'Beranda', '/'),
                 _navbarItem(context, 'Alumni', '/alumni'),
-                _navbarItem(context, 'Kegiatan', '/event'),
+                _navbarItem(context, 'Kegiatan', '/kegiatan'),
                 _navbarItem(context, 'Informasi', '/informasi'),
                 _navbarItem(context, 'Kritik & Saran', '/kritik'),
                 _navbarItem(context, 'Profil', '/profil'),
@@ -115,10 +115,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         PopupMenuItem<String>(
-          value: '/event',
+          value: '/kegiatan',
           child: TextButton(
             onPressed: () {
-              context.go('/event');
+              context.go('/kegiatan');
               Navigator.pop(context);
             },
             child: const Text('Kegiatan'),
@@ -225,18 +225,24 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           context.go('/login'); // Navigasi ke halaman login
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
+          backgroundColor:
+              const Color.fromARGB(255, 23, 114, 110), // Warna hijau
+          foregroundColor: Colors.white, // Warna teks dan ikon
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(20.0), // Sudut melengkung
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          elevation: 3,
+          elevation: 3, // Elevasi tombol
         ),
-        icon: const Icon(Icons.login, size: 20),
+        icon: const Icon(Icons.login,
+            size: 20, color: Colors.white), // Ikon putih
         label: const Text(
           'Login',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16.0,
+            color: Colors.white, // Teks putih
+          ),
         ),
       ),
     );

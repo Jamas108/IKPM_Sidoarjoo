@@ -31,14 +31,7 @@ class AlumniPageContent extends StatelessWidget {
           : AppBar(
               title: const Text(
                 "Daftar Alumni",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
-                ),
+                style: TextStyle(color: Colors.white),
               ),
               backgroundColor: const Color.fromARGB(255, 23, 114, 110),
             ),

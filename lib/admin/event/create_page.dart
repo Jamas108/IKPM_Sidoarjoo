@@ -23,6 +23,15 @@ class _AddEventPageState extends State<AddEventPage> {
 
   Uint8List? _selectedImage;
   String? _selectedImageName;
+  bool _isLoading = false;
+
+  String? _selectedStatus;
+  final List<String> statusOptions = [
+    'Akan Datang',
+    'Sudah Selesai',
+    'Sembunyikan',
+    'Berjalan'
+  ];
 
   Future<void> _pickImageWeb() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -72,6 +81,9 @@ class _AddEventPageState extends State<AddEventPage> {
     String location = locationController.text;
     String description = descriptionController.text;
 
+    // Use a default value for status if it's null
+    String status = _selectedStatus ?? 'Akan Datang';
+
     if (name.isEmpty ||
         date.isEmpty ||
         time.isEmpty ||
@@ -83,29 +95,33 @@ class _AddEventPageState extends State<AddEventPage> {
       return;
     }
 
+    setState(() {
+      _isLoading = true; // Aktifkan indikator loading
+    });
+
     try {
-      // Add event to the backend
       await _eventController.addKegiatan(
         name: name,
         date: date,
         time: time,
         location: location,
         description: description,
+        status: status, // Use the non-nullable status
         imageBytes: _selectedImage,
         imageName: _selectedImageName,
       );
 
-      // Return the new event to the previous page
       Navigator.pop(
           context,
           EventModel(
-            id: 'newId', // You should get the actual ID from the backend response
+            id: 'newId',
             name: name,
             date: date,
             time: time,
             location: location,
             description: description,
-            poster: 'posterPath', // If you have a poster, include its path here
+            status: status,
+            poster: 'posterPath',
           ));
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +131,39 @@ class _AddEventPageState extends State<AddEventPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal menyimpan event: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Matikan indikator loading
+      });
     }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '$label wajib diisi';
+          }
+          return null;
+        },
+      ),
+    );
   }
 
   @override
@@ -178,6 +226,31 @@ class _AddEventPageState extends State<AddEventPage> {
                     icon: Icons.description,
                     maxLines: 3,
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Status Kegiatan',
+                        prefixIcon:
+                            const Icon(Icons.flag), // Ikon di sebelah kiri
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      value: _selectedStatus,
+                      items: statusOptions.map((String status) {
+                        return DropdownMenuItem<String>(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedStatus = newValue;
+                        });
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _pickImageWeb,
@@ -203,15 +276,7 @@ class _AddEventPageState extends State<AddEventPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saveKegiatan,
-                      child: const Text(
-                        'Tambah Kegiatan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color:
-                              Colors.white, // Warna teks diubah menjadi putih
-                        ),
-                      ),
+                      onPressed: _isLoading ? null : _saveKegiatan,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2C7566),
                         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -219,33 +284,21 @@ class _AddEventPageState extends State<AddEventPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : const Text(
+                              'Simpan Kegiatan',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    int maxLines = 1,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
           ),
         ),
       ),

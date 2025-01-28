@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ikpm_sidoarjo/controllers/admin/kegiatan_controller.dart';
 import 'package:ikpm_sidoarjo/models/event_model.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 
 class EditEventPage extends StatefulWidget {
   final EventModel event;
@@ -25,6 +26,8 @@ class _EditEventPageState extends State<EditEventPage> {
 
   Uint8List? _newPosterBytes;
   String? _newPosterName;
+  String? _selectedStatus;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -35,9 +38,10 @@ class _EditEventPageState extends State<EditEventPage> {
     timeController.text = widget.event.time;
     locationController.text = widget.event.location;
     descriptionController.text = widget.event.description;
+    _selectedStatus = widget.event.status; // Menyimpan status sebelumnya
   }
 
-  // Method for selecting a new image (similar to the EditInformasiPage)
+  // Pilih gambar dari file picker
   Future<void> _handlePickImage() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
     if (result != null) {
@@ -48,9 +52,41 @@ class _EditEventPageState extends State<EditEventPage> {
     }
   }
 
-  // Method for updating event data
+  // Pilih tanggal dengan Date Picker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        dateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  // Pilih waktu dengan Time Picker
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        timeController.text = picked.format(context);
+      });
+    }
+  }
+
+  // Simpan perubahan event
   Future<void> _handleUpdateKegiatan() async {
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true; // Aktifkan indikator loading
+    });
 
     try {
       await _eventController.updateKegiatan(
@@ -58,6 +94,8 @@ class _EditEventPageState extends State<EditEventPage> {
         name: nameController.text,
         date: dateController.text,
         time: timeController.text,
+        status: _selectedStatus ??
+            widget.event.status, // Gunakan status sebelumnya jika tidak dipilih
         location: locationController.text,
         description: descriptionController.text,
         imageBytes: _newPosterBytes,
@@ -69,10 +107,10 @@ class _EditEventPageState extends State<EditEventPage> {
         name: nameController.text,
         date: dateController.text,
         time: timeController.text,
+        status: _selectedStatus ?? widget.event.status,
         location: locationController.text,
         description: descriptionController.text,
-        poster:
-            widget.event.poster, // keep the same poster or change if updated
+        poster: widget.event.poster,
       );
 
       Navigator.pop(context, updatedEvent);
@@ -84,6 +122,10 @@ class _EditEventPageState extends State<EditEventPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Matikan indikator loading
+      });
     }
   }
 
@@ -110,37 +152,31 @@ class _EditEventPageState extends State<EditEventPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Display the poster image if available
-                // Image Display with proper alignment and smaller size
+                // Tampilkan gambar poster jika ada
                 if (_newPosterBytes != null || widget.event.poster.isNotEmpty)
                   Center(
                     child: _newPosterBytes != null
                         ? Image.memory(
                             _newPosterBytes!,
-                            height: 250, // Reduced size
-                            width: 250, // Reduced size
-                            fit: BoxFit
-                                .contain, // Ensure the whole image is shown
+                            height: 250,
+                            width: 250,
+                            fit: BoxFit.contain,
                           )
                         : Image.network(
                             widget.event.poster,
-                            height: 250, // Reduced size
-                            width: 250, // Reduced size
-                            fit: BoxFit
-                                .contain, // Ensure the whole image is shown
+                            height: 250,
+                            width: 250,
+                            fit: BoxFit.contain,
                           ),
                   ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _handlePickImage,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   child: const Text(
                     'Pilih Poster Baru',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white, // Warna teks diubah menjadi putih
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                 ),
                 const SizedBox(height: 20),
                 Form(
@@ -149,32 +185,79 @@ class _EditEventPageState extends State<EditEventPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildTextField(
-                          nameController, 'Nama Event', Icons.event),
-                      _buildTextField(
-                          dateController, 'Tanggal Event', Icons.date_range),
-                      _buildTextField(
-                          timeController, 'Waktu Event', Icons.access_time),
-                      _buildTextField(locationController, 'Lokasi Event',
-                          Icons.location_on),
-                      _buildTextField(descriptionController, 'Deskripsi Event',
-                          Icons.description,
-                          maxLines: 3),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _handleUpdateKegiatan,
-                        child: const Text(
-                          'Edit Kegiatan',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color:
-                                Colors.white, // Warna teks diubah menjadi putih
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2C7566),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          nameController, 'Nama Kegiatan', Icons.event),
+                      GestureDetector(
+                        onTap: () => _selectDate(context),
+                        child: AbsorbPointer(
+                          child: _buildTextField(dateController,
+                              'Tanggal Kegiatan', Icons.date_range),
                         ),
                       ),
+                      GestureDetector(
+                        onTap: () => _selectTime(context),
+                        child: AbsorbPointer(
+                          child: _buildTextField(timeController,
+                              'Waktu Kegiatan', Icons.access_time),
+                        ),
+                      ),
+                      _buildTextField(locationController, 'Lokasi Kegiatan',
+                          Icons.location_on),
+                      _buildTextField(descriptionController,
+                          'Deskripsi Kegiatan', Icons.description,
+                          maxLines: 3),
+
+                      const SizedBox(height: 10),
+
+                      // Dropdown untuk memilih Status
+                      DropdownButtonFormField<String>(
+                        value: _selectedStatus,
+                        decoration: const InputDecoration(
+                          labelText: "Status Kegiatan",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.check_circle),
+                        ),
+                        items: [
+                          'Akan Datang',
+                          'Berjalan',
+                          'Selesai',
+                          'Disembunyikan'
+                        ]
+                            .map((status) => DropdownMenuItem(
+                                  value: status,
+                                  child: Text(status),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedStatus = value;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _handleUpdateKegiatan,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2C7566),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : const Text(
+                                  'Perbarui Kegiatan',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -186,7 +269,6 @@ class _EditEventPageState extends State<EditEventPage> {
     );
   }
 
-  // Helper method to build text fields with validation
   Widget _buildTextField(
       TextEditingController controller, String label, IconData icon,
       {int maxLines = 1}) {
@@ -198,16 +280,10 @@ class _EditEventPageState extends State<EditEventPage> {
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return '$label wajib diisi';
-          }
-          return null;
-        },
+        validator: (value) =>
+            value == null || value.isEmpty ? '$label wajib diisi' : null,
       ),
     );
   }

@@ -45,7 +45,7 @@ class _EditProfileAdminPageState extends State<EditProfileAdminPage> {
 
     try {
       await _profilController.saveProfile(context, _formData);
-      GoRouter.of(context).go('/profil');
+      GoRouter.of(context).go('/admin/profil');
     } catch (e) {
       // Error sudah ditangani di ProfilController
     }

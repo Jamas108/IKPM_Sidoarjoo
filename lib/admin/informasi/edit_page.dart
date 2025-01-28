@@ -26,6 +26,7 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
   Uint8List? _newImageBytes;
   String? _newImageName;
   final InformasiController _informasiController = InformasiController();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -67,6 +68,10 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
   Future<void> _updateInformasi() async {
     if (_berita == null || !_formKey.currentState!.validate()) return;
 
+    setState(() {
+      _isLoading = true; // Aktifkan indikator loading
+    });
+
     try {
       await _informasiController.updateInformasi(
         id: _berita!.id,
@@ -97,6 +102,10 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Matikan indikator loading
+      });
     }
   }
 
@@ -155,24 +164,20 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
                         key: _formKey,
                         child: Column(
                           children: [
-                            _buildTextField(
-                                _titleController, 'Judul Informasi', Icons.book),
-                            _buildTextField(
-                                _dateController, 'Tanggal Informasi', Icons.date_range),
-                            _buildTextField(_timeController, 'Waktu Informasi', Icons.access_time),
-                            _buildTextField(
-                                _descriptionController, 'Deskripsi Informasi',Icons.description,
+                            _buildTextField(_titleController, 'Judul Informasi',
+                                Icons.book),
+                            _buildTextField(_dateController,
+                                'Tanggal Informasi', Icons.date_range),
+                            _buildTextField(_timeController, 'Waktu Informasi',
+                                Icons.access_time),
+                            _buildTextField(_descriptionController,
+                                'Deskripsi Informasi', Icons.description,
                                 maxLines: 5),
                             const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _updateInformasi,
-                                child: const Text(
-                                  'Perbarui Informasi',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
-                                ),
+                                onPressed: _isLoading ? null : _updateInformasi,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF2C7566),
                                   padding:
@@ -181,8 +186,19 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
+                                child: _isLoading
+                                    ? const CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      )
+                                    : const Text(
+                                        'Perbarui Informasi',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
                               ),
-                            ),
+                            )
                           ],
                         ),
                       ),
@@ -195,7 +211,8 @@ class _EditInformasiPageState extends State<EditInformasiPage> {
   }
 
   // Helper method to build text fields with validation
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon,
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon,
       {int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
