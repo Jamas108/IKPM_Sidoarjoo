@@ -3,11 +3,11 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"flutter_bootstrap.js": "b034d46168f8965f228bb1f8cc25db3e",
+const RESOURCES = {"flutter_bootstrap.js": "d5c8f21bfeee7852fae0ca13feedf5e3",
 "version.json": "9dc0c56fc5edb973b4f6caa8ecfc226b",
 "index.html": "e8e97ace72f0fe2955c7d7eb36b2894e",
 "/": "e8e97ace72f0fe2955c7d7eb36b2894e",
-"main.dart.js": "2cac9efca22be46140467df612867834",
+"main.dart.js": "3a5416f0215efc4cf9dd75e2fef2c560",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
@@ -22,7 +22,7 @@ const RESOURCES = {"flutter_bootstrap.js": "b034d46168f8965f228bb1f8cc25db3e",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "e986ebe42ef785b27164c36a9abc7818",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "assets/AssetManifest.bin": "7f786a548075754b0355e48bd70ee263",
-"assets/fonts/MaterialIcons-Regular.otf": "669bbbdb0f9adfaf456a0b600ee55889",
+"assets/fonts/MaterialIcons-Regular.otf": "ef7537dcfbdbbd09cdb8dcdeba8b4198",
 "assets/assets/banneralumni.png": "e15d6d72d2bb9795708f6b25a432d055",
 "assets/assets/bannerinformasi.png": "815b7069ded3451a429ff206f75437a7",
 "assets/assets/ikpmsidoarjobanner.jpg": "f3c92481dd33314749b5e5be4739011e",

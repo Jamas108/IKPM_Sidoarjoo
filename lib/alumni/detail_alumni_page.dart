@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../controllers/alumni_controller.dart';
 import '../layouts/navbar_layout.dart';
 import '../layouts/bottom_bar.dart';
@@ -16,7 +17,6 @@ class DetailAlumniPage extends StatelessWidget {
     final alumniController =
         Provider.of<AlumniController>(context, listen: false);
 
-    // Reset detail alumni dan hidden fields setiap kali halaman ini dibuka
     WidgetsBinding.instance.addPostFrameCallback((_) {
       alumniController.resetDetailAlumni();
       alumniController.fetchDetailAlumni(stambuk);
@@ -30,11 +30,10 @@ class DetailAlumniPage extends StatelessWidget {
                 'Detail Alumni',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Roboto',
+                  letterSpacing: 1.2,
                 ),
               ),
               backgroundColor: const Color.fromARGB(255, 23, 114, 110),
@@ -58,8 +57,7 @@ class DetailAlumniPage extends StatelessWidget {
                 }
 
                 if (alumniController.detailAlumni == null) {
-                  return const Center(
-                      child: Text('Data detail tidak ditemukan'));
+                  return const Center(child: Text('Data detail tidak ditemukan'));
                 }
 
                 final hiddenFields = alumniController.hiddenFields;
@@ -172,6 +170,44 @@ class DetailAlumniPage extends StatelessWidget {
               },
             ),
           ),
+          Consumer<AlumniController>(
+            builder: (context, alumniController, child) {
+              if (alumniController.detailAlumni == null) return const SizedBox();
+
+              final detail = alumniController.detailAlumni!;
+              final namaAlumni = detail['nama_alumni'] ?? '-';
+              final stambuk = detail['stambuk'] ?? '-';
+
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final waNumber = '+6281233908357';
+                      final message =
+                          "Assalamualaikum, perkenalkan [nama anda], saya ingin meminta data detail alumni atas nama \"$namaAlumni\" dengan stambuk \"$stambuk\" apakah boleh?";
+                      final waUrl =
+                          'https://wa.me/$waNumber?text=${Uri.encodeComponent(message)}';
+                      launchWhatsApp(waUrl);
+                    },
+                    icon: const Icon(Icons.call_end_outlined, color: Colors.white),
+                    label: const Text(
+                      'Minta Data Detail',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
       bottomNavigationBar: kIsWeb
@@ -187,6 +223,16 @@ class DetailAlumniPage extends StatelessWidget {
               },
             ),
     );
+  }
+
+  void launchWhatsApp(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget _buildHeaderCard(AlumniController alumniController) {
