@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ikpm_sidoarjo/controllers/profil_controller.dart';
 import 'package:provider/provider.dart';
 import '../auth/auth_provider.dart';
 import '../layouts/navbar_layout.dart'; // Navbar untuk Web
@@ -29,70 +30,53 @@ class _SettingsPageState extends State<SettingsPage> {
     'Instansi',
   ];
 
-  List<String> hiddenFields = []; // Daftar field yang disembunyikan
+  List<String> hiddenFields = [];
+  final ProfilController _profilController = ProfilController();
 
   @override
   void initState() {
     super.initState();
-    _fetchHiddenFields();
+    _loadHiddenFields();
   }
 
-  // Fungsi untuk mengambil hidden fields dari backend
-  Future<void> _fetchHiddenFields() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final stambuk = authProvider.userStambuk;
-
-    try {
-      final response =
-          await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // Ambil hidden_fields dari data
-        setState(() {
-          hiddenFields = List<String>.from(data['hidden_fields'] ?? []);
-        });
-      } else {
-        throw Exception('Failed to fetch hidden fields');
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal mengambil data hidden fields')),
-      );
-      print('Error fetching hidden fields: $error');
-    }
+  void _loadHiddenFields() async {
+    final fields = await _profilController.fetchHiddenFields(context);
+    setState(() {
+      hiddenFields = fields;
+    });
   }
 
-  // Fungsi untuk menyimpan hidden fields ke backend
-  Future<void> _updateHiddenFields() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final stambuk = authProvider.userStambuk;
-
-    final response = await http.post(
-      Uri.parse('https://backend-ikpmsidoarjo.vercel.app/hidden_fields/$stambuk'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'hidden_fields': hiddenFields}),
-    );
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hidden fields berhasil diperbarui')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal memperbarui hidden fields')),
-      );
-    }
+  void _saveHiddenFields() async {
+    await _profilController.updateHiddenFields(context, hiddenFields);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: kIsWeb
-          ? const Navbar() // Navbar untuk Web
+          ? const Navbar()
           : AppBar(
-              title: const Text('Atur Data yang Disembunyikan'),
-              backgroundColor: Colors.teal,
+              title: const Text(
+                'Sembunyikan Data',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                ),
+              ),
+              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+              iconTheme: const IconThemeData(color: Colors.white),
+              elevation: 0,
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  GoRouter.of(context).go('/profil');
+                },
+              ),
             ),
       body: Column(
         children: [
@@ -122,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _updateHiddenFields,
+                onPressed: _saveHiddenFields,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -141,25 +125,13 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          // Tambahkan Footer
           const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            color: const Color(0xFF2C7566),
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: const Center(
-              child: Text(
-                "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-            ),
-          ),
         ],
       ),
       bottomNavigationBar: kIsWeb
           ? null
           : BottomBar(
-              currentIndex: 2, // Sesuaikan indeks dengan posisi menu
+              currentIndex: 2,
               onTap: (index) {
                 if (index == 0) {
                   GoRouter.of(context).go('/profile');

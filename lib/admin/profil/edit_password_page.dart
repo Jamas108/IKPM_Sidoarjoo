@@ -5,18 +5,17 @@ import 'package:ikpm_sidoarjo/controllers/profil_controller.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../auth/auth_provider.dart';
-import '../layouts/navbar_layout.dart';
-import '../layouts/bottom_bar.dart';
+import 'package:ikpm_sidoarjo/auth/auth_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class EditPasswordPage extends StatefulWidget {
-  const EditPasswordPage({Key? key}) : super(key: key);
+class EditPasswordAdminPage extends StatefulWidget {
+  const EditPasswordAdminPage({Key? key}) : super(key: key);
 
   @override
-  State<EditPasswordPage> createState() => _EditPasswordPageState();
+  State<EditPasswordAdminPage> createState() => _EditPasswordAdminPageState();
 }
 
-class _EditPasswordPageState extends State<EditPasswordPage> {
+class _EditPasswordAdminPageState extends State<EditPasswordAdminPage> {
   final _formKey = GlobalKey<FormState>();
   String _newPassword = '';
   String _confirmPassword = '';
@@ -28,40 +27,29 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
     try {
       await _profilController.savePassword(context, _newPassword);
-      GoRouter.of(context).go('/profil'); // Redirect ke halaman profil
+      GoRouter.of(context).go('/admin/profil'); // Redirect to profile page
     } catch (e) {
-      // Error sudah ditangani di ProfilController
+      // Handle error in ProfilController
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb
-          ? const Navbar() // Navbar untuk Web
-          : AppBar(
-              title: const Text(
-                'Edit Password',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
-                ),
-              ),
-              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
-              iconTheme: const IconThemeData(color: Colors.white),
-              elevation: 0,
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  GoRouter.of(context).go('/profil');
-                },
-              ),
-            ),
+      appBar: AppBar(
+        title: Text(
+          'Edit Password',
+          style: GoogleFonts.lato(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+           GoRouter.of(context).go('/admin/profil');
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -127,18 +115,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           ),
         ),
       ),
-      bottomNavigationBar: kIsWeb
-          ? null
-          : BottomBar(
-              currentIndex: 0,
-              onTap: (index) {
-                if (index == 0) {
-                  GoRouter.of(context).go('/profil');
-                } else if (index == 1) {
-                  GoRouter.of(context).go('/alumni');
-                }
-              },
-            ),
     );
   }
 }

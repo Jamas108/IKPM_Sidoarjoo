@@ -2,40 +2,23 @@ import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../auth/auth_provider.dart';
-import '../layouts/navbar_layout.dart';
-import '../layouts/bottom_bar.dart';
+import 'package:ikpm_sidoarjo/auth/auth_provider.dart';
+import 'package:ikpm_sidoarjo/admin/layouts/sidebar.dart';// Your existing Sidebar Layout
 
-class ProfilPage extends StatefulWidget {
-  const ProfilPage({Key? key}) : super(key: key);
+class AdminProfilPage extends StatefulWidget {
+  const AdminProfilPage({Key? key}) : super(key: key);
 
   @override
-  State<ProfilPage> createState() => _ProfilPageState();
+  State<AdminProfilPage> createState() => _AdminProfilPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage> {
+class _AdminProfilPageState extends State<AdminProfilPage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
-    return Scaffold(
-      appBar: kIsWeb
-          ? const Navbar() // Navbar untuk Web
-          : AppBar(
-              title: const Text(
-                "Profil Anda",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
-                ),
-              ),
-              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
-            ),
-      body: authProvider.isLoggedIn
+    return AdminSidebarLayout(
+      child: authProvider.isLoggedIn
           ? Column(
               children: [
                 Expanded(
@@ -51,23 +34,18 @@ class _ProfilPageState extends State<ProfilPage> {
                             const SizedBox(height: 24),
                             _buildInfoSection(authProvider),
                             const SizedBox(height: 24),
-                            _buildSettingsButton(context),
-                            const SizedBox(height: 16), // Spasi antara tombol
-                            _buildHistoryEventButton(context),
-                            const SizedBox(height: 16), // Spasi antara tombol
                             _buildEditProfileButton(context),
                             const SizedBox(height: 16),
                             _buildEditPasswordButton(context),
                             const SizedBox(height: 16),
                             _buildLogoutButton(context),
-                            const SizedBox(height: 16), // Tambahkan tombol baru
+                            const SizedBox(height: 16),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Tambahkan Footer
               ],
             )
           : const Center(
@@ -79,19 +57,6 @@ class _ProfilPageState extends State<ProfilPage> {
                   color: Colors.red,
                 ),
               ),
-            ),
-      bottomNavigationBar: kIsWeb
-          ? null
-          : BottomBar(
-              currentIndex: 0, // Sesuaikan dengan posisi menu di navbar
-              onTap: (index) {
-                // Handle perubahan halaman sesuai dengan index navbar
-                if (index == 0) {
-                  GoRouter.of(context).go('/profile');
-                } else if (index == 1) {
-                  GoRouter.of(context).go('/alumni');
-                }
-              },
             ),
     );
   }
@@ -132,7 +97,7 @@ class _ProfilPageState extends State<ProfilPage> {
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
         const SizedBox(height: 8),
@@ -140,7 +105,7 @@ class _ProfilPageState extends State<ProfilPage> {
           'Stambuk: ${authProvider.userStambuk ?? '-'}',
           style: const TextStyle(
             fontSize: 16,
-            color: Colors.black,
+            color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
       ],
@@ -248,56 +213,7 @@ class _ProfilPageState extends State<ProfilPage> {
     );
   }
 
-  Widget _buildSettingsButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            GoRouter.of(context).go('/settings');
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          child: const Text(
-            'Atur Data yang Disembunyikan',
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildHistoryEventButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            GoRouter.of(context)
-                .go('/riwayat-event'); // Navigasi ke RiwayatEventPage
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          child: const Text(
-            'Riwayat Kegiatan',
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildEditProfileButton(BuildContext context) {
     return Padding(
@@ -307,7 +223,7 @@ class _ProfilPageState extends State<ProfilPage> {
         child: ElevatedButton(
           onPressed: () {
             GoRouter.of(context)
-                .go('/edit-profile'); // Navigasi ke RiwayatEventPage
+                .go('/admin/edit-profile'); // Navigasi ke RiwayatEventPage
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.teal,
@@ -375,7 +291,7 @@ class _ProfilPageState extends State<ProfilPage> {
               onPressed: () {
                 if (currentPassword == authProvider.userPassword) {
                   Navigator.pop(context); // Tutup modal
-                  GoRouter.of(context).go('/edit-password');
+                  GoRouter.of(context).go('/admin/edit-password');
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Password salah')),

@@ -20,12 +20,12 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
   @override
   void initState() {
     super.initState();
-    _loadKritik();
+    _fetchAndSetKritik();
   }
 
-  Future<void> _loadKritik() async {
+  Future<void> _fetchAndSetKritik() async {
     try {
-      final kritik = await _kritikController.fetchKritik();
+      final kritik = await _kritikController.getAllKritik();
       setState(() {
         _kritikList = kritik;
         _filteredKritikList = List.from(kritik);
@@ -35,33 +35,6 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load kritik: $e')),
-      );
-    }
-  }
-
-  void _onSearch(String query) {
-    setState(() {
-      _filteredKritikList = _kritikList
-          .where((kritik) =>
-              kritik.nama.toLowerCase().contains(query.toLowerCase()) ||
-              kritik.kritik.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
-  Future<void> _onDeleteKritik(String kritikId) async {
-    try {
-      await _kritikController.deleteKritik(kritikId);
-      setState(() {
-        _kritikList.removeWhere((kritik) => kritik.id == kritikId);
-        _filteredKritikList = List.from(_kritikList);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kritik berhasil dihapus')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting kritik: $e')),
       );
     }
   }
@@ -76,7 +49,6 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
                   Text(
                     'Daftar Kritik',
                     style: GoogleFonts.lato(
@@ -85,10 +57,11 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Search Bar
                   TextField(
-                    onChanged: _onSearch,
+                    onChanged: (query) => setState(() {
+                      _filteredKritikList = _kritikController.searchKritik(
+                          query, _kritikList);
+                    }),
                     decoration: const InputDecoration(
                       labelText: 'Cari Kritik',
                       border: OutlineInputBorder(),
@@ -96,8 +69,6 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // List Kritik
                   Expanded(
                     child: Card(
                       color: Colors.white,
@@ -186,7 +157,29 @@ class _KritikPageAdminState extends State<KritikPageAdmin> {
                                           );
 
                                           if (confirmDelete == true) {
-                                            await _onDeleteKritik(kritik.id);
+                                            try {
+                                              await _kritikController
+                                                  .deleteKritik(kritik.id);
+                                              setState(() {
+                                                _kritikList.remove(kritik);
+                                                _filteredKritikList
+                                                    .remove(kritik);
+                                              });
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      'Kritik berhasil dihapus'),
+                                                ),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Error deleting kritik: $e')),
+                                              );
+                                            }
                                           }
                                         },
                                       ),

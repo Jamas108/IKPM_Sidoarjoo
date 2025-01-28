@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:ikpm_sidoarjo/models/informasi_model.dart';
 import 'package:intl/intl.dart';
 import 'package:ikpm_sidoarjo/controllers/admin/informasi_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AddInformasiPage extends StatefulWidget {
   const AddInformasiPage({Key? key}) : super(key: key);
@@ -89,10 +91,21 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
         imageName: _selectedImageName,
       );
 
+      // Return the newly created Informasi object to the previous page
+      Navigator.pop(
+          context,
+          InformasiModel(
+            id: 'newId', // You should get the actual ID from the backend response
+            name: title,
+            date: date,
+            time: time,
+            description: description,
+            image: 'posterPath', // If you have a poster, include its path here
+          ));
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Informasi berhasil ditambahkan')),
       );
-      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saat menyimpan informasi: $e')),
@@ -104,8 +117,11 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Informasi'),
-        backgroundColor: const Color(0xFF2C7566),
+        title: Text(
+          'Tambah Informasi',
+          style: GoogleFonts.lato(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -121,15 +137,6 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Tambah Informasi Baru',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: titleController,
@@ -165,9 +172,8 @@ class _AddInformasiPageState extends State<AddInformasiPage> {
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _pickImage,
-                    icon: const Icon(Icons.image, color: Colors.white),
                     label: const Text(
-                      'Upload Gambar Informasi',
+                      'Unggah Gambar Informasi',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(

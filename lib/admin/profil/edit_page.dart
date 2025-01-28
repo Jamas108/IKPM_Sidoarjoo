@@ -5,18 +5,17 @@ import 'package:ikpm_sidoarjo/controllers/profil_controller.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../auth/auth_provider.dart';
-import '../layouts/navbar_layout.dart';
-import '../layouts/bottom_bar.dart';
+import 'package:ikpm_sidoarjo/auth/auth_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+class EditProfileAdminPage extends StatefulWidget {
+  const EditProfileAdminPage({Key? key}) : super(key: key);
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  State<EditProfileAdminPage> createState() => _EditProfileAdminPageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfileAdminPageState extends State<EditProfileAdminPage> {
   final _formKey = GlobalKey<FormState>();
   Map<String, dynamic> _formData = {};
   bool _isLoading = true;
@@ -55,31 +54,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb
-          ? const Navbar()
-          : AppBar(
-              title: const Text(
-                'Edit Profil',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
-                ),
-              ),
-              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
-              iconTheme: const IconThemeData(color: Colors.white),
-              elevation: 0,
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  GoRouter.of(context).go('/profil');
-                },
-              ),
-            ),
+      appBar: AppBar(
+        title: Text(
+          'Edit Profil',
+          style: GoogleFonts.lato(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+          GoRouter.of(context).go('/admin/profil');
+          },
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -117,8 +105,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               return Container();
                             }
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
                               child: TextFormField(
                                 initialValue:
                                     _formData[field]?.toString() ?? '',
@@ -175,18 +162,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ],
               ),
-            ),
-      bottomNavigationBar: kIsWeb
-          ? null
-          : BottomBar(
-              currentIndex: 0,
-              onTap: (index) {
-                if (index == 0) {
-                  GoRouter.of(context).go('/profil');
-                } else if (index == 1) {
-                  GoRouter.of(context).go('/alumni');
-                }
-              },
             ),
     );
   }

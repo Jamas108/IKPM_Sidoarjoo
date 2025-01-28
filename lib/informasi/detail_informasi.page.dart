@@ -6,6 +6,7 @@ import '../controllers/comment_controller.dart';
 import '../models/comment_model.dart';
 import '../auth/auth_provider.dart';
 import '../layouts/navbar_layout.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailInformasi extends StatefulWidget {
   final InformasiModel informasi;
@@ -186,11 +187,25 @@ class _DetailInformasiState extends State<DetailInformasi> {
           : AppBar(
               title: const Text(
                 'Detail Informasi',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                ),
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+              iconTheme: const IconThemeData(color: Colors.white),
               elevation: 0,
               automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  GoRouter.of(context).go('/informasi');
+                },
+              ),
             ),
       body: SingleChildScrollView(
         child: Column(

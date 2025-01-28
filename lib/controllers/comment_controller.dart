@@ -37,13 +37,13 @@ class CommentController {
 
   // Tambahkan komentar baru
   Future<void> addComment(
-      String beritaId, String stambuk, String comment) async {
+      String informasiId, String stambuk, String comment) async {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/comments'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'beritaId': beritaId,
+          'informasiId': informasiId,
           'stambuk': stambuk,
           'comment': comment,
         }),

@@ -1,55 +1,54 @@
-import 'package:flutter/foundation.dart'; // Untuk mendeteksi Web
+import 'package:flutter/foundation.dart'; // Untuk deteksi Web
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../controllers/informasi_controller.dart';
-import '../models/informasi_model.dart';
+import '../controllers/kegiatan_controller.dart'; // Controller Event
+import '../models/event_model.dart'; // Model Event
 import '../layouts/navbar_layout.dart'; // Navbar untuk Web
 import '../layouts/bottom_bar.dart'; // BottomBar untuk Android
 
-class InformasiPage extends StatefulWidget {
-  const InformasiPage({super.key});
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
 
   @override
-  _InformasiPageState createState() => _InformasiPageState();
+  _EventPageState createState() => _EventPageState();
 }
 
-class _InformasiPageState extends State<InformasiPage> {
-  final InformasiController _informasiController = InformasiController();
-  List<InformasiModel> _informasiList = [];
-  List<InformasiModel> _filteredInformasiList = [];
-  bool _isLoading = true;
+class _EventPageState extends State<EventPage> {
+  final EventController _eventController = EventController();
   final TextEditingController _searchController = TextEditingController();
-  int _currentIndex = 2; // Indeks untuk navigasi BottomBar (Informasi)
+  List<EventModel> _filteredKegiatanList = [];
+  bool _isLoading = true;
+  int _currentIndex = 1; // Indeks untuk navigasi BottomBar (Kegiatan)
 
   @override
   void initState() {
     super.initState();
-    _fetchInformasi();
+    _loadData();
   }
 
-  Future<void> _fetchInformasi() async {
+  Future<void> _loadData() async {
     try {
-      final informasiList = await _informasiController.fetchInformasi();
       setState(() {
-        _informasiList = informasiList;
-        _filteredInformasiList = informasiList;
+        _isLoading = true;
+      });
+      final events = await _eventController.fetchKegiatan();
+      setState(() {
+        _filteredKegiatanList = events;
         _isLoading = false;
       });
     } catch (error) {
-      print('Error fetching informasi: $error');
       setState(() {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load informasi')),
+        const SnackBar(content: Text('Failed to load events')),
       );
     }
   }
 
   void _onSearch(String query) {
     setState(() {
-      _filteredInformasiList =
-          _informasiController.filterInformasi(_informasiList, query);
+      _filteredKegiatanList = _eventController.filterKegiatan(query);
     });
   }
 
@@ -63,7 +62,7 @@ class _InformasiPageState extends State<InformasiPage> {
           ? const Navbar() // Navbar untuk Web
           : AppBar(
               title: const Text(
-                "Daftar Informasi",
+                "Daftar Kegiatan",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20, // Ukuran font lebih besar
@@ -80,13 +79,13 @@ class _InformasiPageState extends State<InformasiPage> {
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  // Banner - hanya muncul di Web
+                  // Tampilkan banner hanya di Web
                   if (isWeb)
                     SizedBox(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height / 2,
                       child: Image.asset(
-                        'assets/bannerinformasi.png',
+                        'assets/BANNER.png',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -99,8 +98,8 @@ class _InformasiPageState extends State<InformasiPage> {
                       controller: _searchController,
                       onChanged: _onSearch,
                       decoration: InputDecoration(
-                        labelText: 'Cari Informasi',
-                        hintText: 'Masukkan nama informasi',
+                        labelText: 'Cari Event',
+                        hintText: 'Masukkan nama event',
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -111,13 +110,13 @@ class _InformasiPageState extends State<InformasiPage> {
                   const SizedBox(height: 16),
 
                   // Pesan jika tidak ada hasil pencarian
-                  if (_filteredInformasiList.isEmpty)
+                  if (_filteredKegiatanList.isEmpty)
                     Column(
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 32.0),
                           child: const Text(
-                            'Informasi tidak ditemukan.',
+                            'Kegiatan tidak ditemukan.',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -127,39 +126,39 @@ class _InformasiPageState extends State<InformasiPage> {
                         ),
                         // Spacer untuk mendorong footer ke bawah
                         SizedBox(
-                          height: MediaQuery.of(context).size.height *
-                              0.3, // 30% tinggi layar
+                          height: MediaQuery.of(context).size.height * 0.3,
                         ),
                       ],
                     ),
 
                   // GridView Responsif
-                  if (_filteredInformasiList.isNotEmpty)
+                  if (_filteredKegiatanList.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Wrap(
                         spacing: 16.0,
                         runSpacing: 16.0,
                         alignment: WrapAlignment.start,
-                        children: _filteredInformasiList.map((informasi) {
-                          return _buildInformasiCard(informasi, width);
+                        children: _filteredKegiatanList.map((event) {
+                          return _buildKegiatanCard(event, width);
                         }).toList(),
                       ),
                     ),
 
                   // Footer
                   const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    color: const Color(0xFF2C7566),
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: const Center(
-                      child: Text(
-                        "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                  if (isWeb)
+                    Container(
+                      width: double.infinity,
+                      color: const Color(0xFF2C7566),
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: const Center(
+                        child: Text(
+                          "© 2025 IKPM Sidoarjo. All Rights Reserved.",
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -176,7 +175,7 @@ class _InformasiPageState extends State<InformasiPage> {
     );
   }
 
-  Widget _buildInformasiCard(InformasiModel informasi, double width) {
+  Widget _buildKegiatanCard(EventModel event, double width) {
     double cardWidth;
     if (width > 1200) {
       cardWidth = width / 4 - 32; // 4 kolom
@@ -191,8 +190,8 @@ class _InformasiPageState extends State<InformasiPage> {
     return GestureDetector(
       onTap: () {
         context.go(
-          '/informasi/detail/${informasi.id}',
-          extra: {'informasi': informasi}, // Kirim data dengan extra
+          '/kegiatan/detail/${event.id}',
+          extra: {'event': event},
         );
       },
       child: Container(
@@ -223,9 +222,8 @@ class _InformasiPageState extends State<InformasiPage> {
                   height: 140,
                   width: double.infinity,
                   child: Image.network(
-                    informasi.image,
-                    fit: BoxFit
-                        .contain, // Agar gambar ditampilkan dalam ukuran asli tanpa dipotong
+                    event.poster,
+                    fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
                         child: Text(
@@ -244,7 +242,7 @@ class _InformasiPageState extends State<InformasiPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    informasi.name,
+                    event.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -254,7 +252,7 @@ class _InformasiPageState extends State<InformasiPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Tanggal: ${informasi.date}',
+                    'Tanggal: ${event.date}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.teal,
@@ -262,12 +260,12 @@ class _InformasiPageState extends State<InformasiPage> {
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
-                    width: double.infinity, // Lebar tombol memenuhi kartu
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
                         context.go(
-                          '/informasi/detail/${informasi.id}',
-                          extra: {'informasi': informasi},
+                          '/kegiatan/detail/${event.id}',
+                          extra: {'event': event},
                         );
                       },
                       style: ElevatedButton.styleFrom(

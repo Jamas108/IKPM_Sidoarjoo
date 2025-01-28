@@ -29,7 +29,17 @@ class AlumniPageContent extends StatelessWidget {
       appBar: kIsWeb
           ? const Navbar()
           : AppBar(
-              title: const Text("Halaman Alumni"),
+              title: const Text(
+                "Daftar Alumni",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                ),
+              ),
               backgroundColor: const Color.fromARGB(255, 23, 114, 110),
             ),
       body: alumniController.isLoading
@@ -47,8 +57,11 @@ class AlumniPageContent extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
+                  const SizedBox(height: 16),
+                  // Ganti padding di elemen-elemen yang memerlukan jarak lebih jauh
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0), // Lebih besar dari sebelumnya (16.0)
                     child: TextField(
                       controller: alumniController.searchController,
                       decoration: InputDecoration(
@@ -62,13 +75,13 @@ class AlumniPageContent extends StatelessWidget {
                       onChanged: (value) => alumniController.filterAlumniData(),
                     ),
                   ),
-                  // Filter Section
+
+// Bagian Filter
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
+                        horizontal: 32.0, vertical: 8.0),
                     child: Row(
                       children: [
-                        // Filter Tahun
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
@@ -77,20 +90,15 @@ class AlumniPageContent extends StatelessWidget {
                             onChanged: (value) {
                               alumniController.setTahunFilter(value);
                             },
-                            items: alumniController.alumniData
-                                .map((e) => e['tahun'])
-                                .toSet()
-                                .toList()
-                                .map((tahun) {
-                              return DropdownMenuItem<String>(
-                                value: tahun.toString(),
-                                child: Text(tahun.toString()),
-                              );
-                            }).toList(),
+                            items: alumniController.sortedTahunList
+                                .map((tahun) => DropdownMenuItem<String>(
+                                      value: tahun,
+                                      child: Text(tahun),
+                                    ))
+                                .toList(),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Filter Kampus Asal
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
@@ -99,20 +107,15 @@ class AlumniPageContent extends StatelessWidget {
                             onChanged: (value) {
                               alumniController.setPondokFilter(value);
                             },
-                            items: alumniController.alumniData
-                                .map((e) => e['kampus_asal'])
-                                .toSet()
-                                .toList()
-                                .map((pondok) {
-                              return DropdownMenuItem<String>(
-                                value: pondok.toString(),
-                                child: Text(pondok.toString()),
-                              );
-                            }).toList(),
+                            items: alumniController.sortedPondokList
+                                .map((pondok) => DropdownMenuItem<String>(
+                                      value: pondok,
+                                      child: Text(pondok),
+                                    ))
+                                .toList(),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Filter Kecamatan
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
@@ -121,20 +124,15 @@ class AlumniPageContent extends StatelessWidget {
                             onChanged: (value) {
                               alumniController.setKecamatanFilter(value);
                             },
-                            items: alumniController.alumniData
-                                .map((e) => e['kecamatan'])
-                                .toSet()
-                                .toList()
-                                .map((kecamatan) {
-                              return DropdownMenuItem<String>(
-                                value: kecamatan.toString(),
-                                child: Text(kecamatan.toString()),
-                              );
-                            }).toList(),
+                            items: alumniController.sortedKecamatanList
+                                .map((kecamatan) => DropdownMenuItem<String>(
+                                      value: kecamatan,
+                                      child: Text(kecamatan),
+                                    ))
+                                .toList(),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Reset Button
                         ElevatedButton.icon(
                           onPressed: () {
                             alumniController.resetFilters();
@@ -158,9 +156,11 @@ class AlumniPageContent extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Tabel Data Alumni
+
+// Bagian Tabel Data
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0), // Lebih besar dari sebelumnya
                     child: PaginatedDataTable(
                       header: const Text('Data Alumni'),
                       columns: const [

@@ -42,7 +42,7 @@ class BottomBar extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.event),
-              label: 'Event',
+              label: 'Kegiatan',
             ),
             BottomNavigationBarItem(
               icon: SizedBox(), // Kosongkan slot untuk alumni

@@ -12,8 +12,7 @@ class KritikPage extends StatelessWidget {
     final kritikController = Provider.of<KritikController>(context);
     final authProvider = Provider.of<AuthProvider>(context);
 
-    final TextEditingController kritikControllerInput =
-        TextEditingController();
+    final TextEditingController kritikControllerInput = TextEditingController();
 
     void submitKritik() async {
       try {
@@ -70,8 +69,10 @@ class KritikPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Padding lebih besar di sekitar konten utama
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0), // Jarak horizontal lebih besar
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -88,7 +89,8 @@ class KritikPage extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                            hintText: 'Tuliskan kritik dan saran Anda di sini...',
+                            hintText:
+                                'Tuliskan kritik dan saran Anda di sini...',
                           ),
                         ),
                         const SizedBox(height: 16),

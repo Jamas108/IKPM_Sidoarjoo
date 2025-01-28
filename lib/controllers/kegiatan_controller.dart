@@ -1,4 +1,4 @@
-import 'dart:convert';
+  import 'dart:convert';
 import 'package:flutter/foundation.dart'; // Untuk deteksi platform
 import 'package:http/http.dart' as http;
 import '../models/event_model.dart';
@@ -7,6 +7,7 @@ class EventController {
   // URL untuk endpoint API event
   late final String apiUrl;
   late final String _baseUrl;
+  List<EventModel> _cachedEventList = [];
 
   EventController() {
     // Deteksi platform
@@ -21,7 +22,7 @@ class EventController {
     }
   }
 
-  Future<List<EventModel>> fetchEvents() async {
+ Future<List<EventModel>> fetchKegiatan() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
@@ -29,13 +30,14 @@ class EventController {
         final List<dynamic> jsonData = json.decode(response.body);
 
         // Konversi JSON menjadi list EventModel
-        return jsonData.map((event) => EventModel.fromJson(event)).toList();
+        _cachedEventList =
+            jsonData.map((event) => EventModel.fromJson(event)).toList();
+        return _cachedEventList;
       } else {
         throw Exception(
             'Failed to load events. Status Code: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error fetching events: $error');
       throw Exception('Error fetching events: $error');
     }
   }
@@ -182,7 +184,7 @@ class EventController {
   //   }
   // }
 
- Future<List<String>> fetchParticipationKegiatanIds(String stambuk) async {
+  Future<List<String>> fetchParticipationKegiatanIds(String stambuk) async {
     final url = Uri.parse('$_baseUrl/historyevent/$stambuk');
     final response = await http.get(url);
 
@@ -194,7 +196,7 @@ class EventController {
     }
   }
 
- Future<List<EventModel>> fetchParticipatedEvents(String userId) async {
+  Future<List<EventModel>> fetchRiwayatKegiatan(String userId) async {
     final url = Uri.parse('$_baseUrl/historyevent/$userId');
     final response = await http.get(url);
 
@@ -205,5 +207,11 @@ class EventController {
       throw Exception(
           'Failed to fetch participated events. Status code: ${response.statusCode}');
     }
+  }
+
+  List<EventModel> filterKegiatan(String query) {
+    return _cachedEventList.where((event) {
+      return event.name.toLowerCase().contains(query.toLowerCase());
+    }).toList();
   }
 }

@@ -18,7 +18,8 @@ class AdminSidebarLayout extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Admin IKPM Sidoarjo',
-          style: TextStyle(color: Colors.white), // Ubah warna teks menjadi putih
+          style:
+              TextStyle(color: Colors.white), // Ubah warna teks menjadi putih
         ),
         backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(
@@ -26,7 +27,8 @@ class AdminSidebarLayout extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white), // Ikon logout putih
+            icon: const Icon(Icons.logout,
+                color: Colors.white), // Ikon logout putih
             onPressed: () async {
               await authProvider.logout();
               context.go('/login');
@@ -79,7 +81,7 @@ class AdminSidebarLayout extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.event),
-              title: const Text('Kelola Event'),
+              title: const Text('Kelola Kegiatan'),
               onTap: () {
                 context.go('/admin/events');
               },
@@ -96,6 +98,13 @@ class AdminSidebarLayout extends StatelessWidget {
               title: const Text('Kelola Kritik & Saran'),
               onTap: () {
                 context.go('/admin/kritik');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profil'),
+              onTap: () {
+                context.go('/admin/profil');
               },
             ),
             ListTile(

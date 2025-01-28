@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ikpm_sidoarjo/controllers/admin/alumni_controller.dart';
 
 class AddAlumniPage extends StatefulWidget {
   const AddAlumniPage({Key? key}) : super(key: key);
@@ -11,6 +12,7 @@ class AddAlumniPage extends StatefulWidget {
 
 class _AddAlumniPageState extends State<AddAlumniPage> {
   final _formKey = GlobalKey<FormState>();
+  final AlumniController _alumniController = AlumniController();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _stambukController = TextEditingController();
   final TextEditingController _tahunController = TextEditingController();
@@ -45,29 +47,17 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
       };
 
       try {
-        const String apiUrl = 'https://backend-ikpmsidoarjo.vercel.app/alumni'; // Ganti URL ini dengan endpoint backend Anda
-        final response = await http.post(
-          Uri.parse(apiUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(alumniData),
-        );
+        final isSuccess = await _alumniController.createAlumni(alumniData);
 
-        if (response.statusCode == 201) {
+        if (isSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Data alumni berhasil ditambahkan!')),
           );
           Navigator.pop(context);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Gagal menambahkan data: ${response.statusCode} - ${response.body}'),
-            ),
-          );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Terjadi kesalahan: $e')),
+          SnackBar(content: Text('Gagal menambahkan data: $e')),
         );
       }
     }
@@ -80,14 +70,16 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
         title: const Text('Tambah Alumni'),
         backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(color: Colors.white),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
       body: Container(
         color: const Color(0xFFF6F7FB),
         padding: const EdgeInsets.all(16.0),
         child: Card(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(

@@ -5,7 +5,10 @@ import 'package:ikpm_sidoarjo/admin/alumni/detail_page.dart';
 import 'package:ikpm_sidoarjo/admin/alumni/edit_page.dart';
 import 'package:ikpm_sidoarjo/admin/alumni/edit_password_page.dart';
 import 'package:ikpm_sidoarjo/admin/alumni/index_page.dart';
-import 'package:ikpm_sidoarjo/admin/kritik/kritik_page.dart';
+import 'package:ikpm_sidoarjo/admin/kritik/index_page.dart';
+import 'package:ikpm_sidoarjo/admin/profil/edit_page.dart';
+import 'package:ikpm_sidoarjo/admin/profil/edit_password_page.dart';
+import 'package:ikpm_sidoarjo/admin/profil/index_page.dart';
 import 'package:ikpm_sidoarjo/alumni/detail_alumni_page.dart';
 import 'package:ikpm_sidoarjo/controllers/kritik_controller.dart';
 import 'package:ikpm_sidoarjo/controllers/login_controller.dart';
@@ -16,13 +19,13 @@ import 'auth/auth_provider.dart';
 import 'home_page.dart';
 import 'auth/login_page.dart';
 import 'informasi/informasi_page.dart';
-import 'event/event_page.dart';
+import 'event/kegiatan_page.dart';
 import 'kritik/kritik_page.dart';
 import 'profil/profil_page.dart';
 import 'alumni/alumni_page.dart';
-import 'event/event_detail_page.dart';
+import 'event/kegiatan_detail_page.dart';
 import 'models/event_model.dart';
-import 'controllers/event_controller.dart';
+import 'controllers/kegiatan_controller.dart';
 import 'models/informasi_model.dart';
 import 'informasi/detail_informasi.page.dart';
 import 'admin/home_page.dart';
@@ -160,7 +163,7 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: 'detail/:stambuk',
+          path: 'details/:stambuk',
           builder: (context, state) {
             final stambuk = state.pathParameters['stambuk']!;
             return AlumniDetailPage(stambuk: stambuk);
@@ -204,6 +207,18 @@ final GoRouter _router = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: '/admin/profil',
+      builder: (context, state) => const AdminProfilPage(),
+    ),
+    GoRoute(
+      path: '/admin/edit-profile',
+      builder: (context, state) => const EditProfileAdminPage(),
+    ),
+    GoRoute(
+      path: '/admin/edit-password',
+      builder: (context, state) => const EditPasswordAdminPage(),
+    ),
 
     //PUBLIC ROUTE
     GoRoute(
@@ -238,18 +253,7 @@ final GoRouter _router = GoRouter(
         ),
       ],
     ),
-    // GoRoute(
-    //   path: '/event',
-    //   builder: (context, state) => const EventPage(),
-    // ),
-    // GoRoute(
-    //   path: '/event/:id',
-    //   builder: (context, state) {
-    //     final extra = state.extra as Map<String, dynamic>;
-    //     final EventModel event = extra['event'] as EventModel;
-    //     return DetailEvent(event: event);
-    //   },
-    // ),
+
     GoRoute(
       path: '/kritik',
       builder: (context, state) => const KritikPage(),

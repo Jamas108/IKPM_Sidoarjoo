@@ -26,38 +26,153 @@ class DetailAlumniPage extends StatelessWidget {
       appBar: kIsWeb
           ? const Navbar()
           : AppBar(
-              title: const Text('Detail Alumni'),
-              backgroundColor: Colors.teal,
-            ),
-      body: Consumer<AlumniController>(
-        builder: (context, alumniController, child) {
-          if (alumniController.isDetailLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (alumniController.detailAlumni == null) {
-            return const Center(child: Text('Data detail tidak ditemukan'));
-          }
-
-          final hiddenFields = alumniController.hiddenFields;
-
-          return Stack(
-            children: [
-              _buildBackground(),
-              SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 150.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildHeader(alumniController),
-                    const SizedBox(height: 24),
-                    _buildInfoSection(alumniController, hiddenFields),
-                  ],
+              title: const Text(
+                'Detail Alumni',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
                 ),
               ),
-            ],
-          );
-        },
+              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+              iconTheme: const IconThemeData(color: Colors.white),
+              elevation: 0,
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  GoRouter.of(context).go('/alumni');
+                },
+              ),
+            ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Consumer<AlumniController>(
+              builder: (context, alumniController, child) {
+                if (alumniController.isDetailLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (alumniController.detailAlumni == null) {
+                  return const Center(
+                      child: Text('Data detail tidak ditemukan'));
+                }
+
+                final hiddenFields = alumniController.hiddenFields;
+
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        _buildHeaderCard(alumniController),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('Informasi Alumni'),
+                        const SizedBox(height: 10),
+                        _buildInfoSection(
+                          alumniController,
+                          hiddenFields,
+                          [
+                            {
+                              'icon': Icons.person,
+                              'title': 'Nama',
+                              'key': 'nama_alumni'
+                            },
+                            {
+                              'icon': Icons.confirmation_number,
+                              'title': 'Stambuk',
+                              'key': 'stambuk'
+                            },
+                            {
+                              'icon': Icons.calendar_today,
+                              'title': 'Tahun Alumni',
+                              'key': 'tahun'
+                            },
+                            {
+                              'icon': Icons.school,
+                              'title': 'Kampus Asal',
+                              'key': 'kampus_asal'
+                            },
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('Kontak dan Alamat'),
+                        const SizedBox(height: 10),
+                        _buildInfoSection(
+                          alumniController,
+                          hiddenFields,
+                          [
+                            {
+                              'icon': Icons.home,
+                              'title': 'Alamat',
+                              'key': 'alamat'
+                            },
+                            {
+                              'icon': Icons.phone,
+                              'title': 'No Telepon',
+                              'key': 'no_telepon'
+                            },
+                            {
+                              'icon': Icons.people,
+                              'title': 'Pasangan',
+                              'key': 'pasangan'
+                            },
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('Pekerjaan'),
+                        const SizedBox(height: 10),
+                        _buildInfoSection(
+                          alumniController,
+                          hiddenFields,
+                          [
+                            {
+                              'icon': Icons.work,
+                              'title': 'Pekerjaan',
+                              'key': 'pekerjaan'
+                            },
+                            {
+                              'icon': Icons.badge,
+                              'title': 'Nama Laqob',
+                              'key': 'nama_laqob'
+                            },
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('Informasi Lain'),
+                        const SizedBox(height: 10),
+                        _buildInfoSection(
+                          alumniController,
+                          hiddenFields,
+                          [
+                            {'icon': Icons.cake, 'title': 'TTL', 'key': 'ttl'},
+                            {
+                              'icon': Icons.location_city,
+                              'title': 'Kecamatan',
+                              'key': 'kecamatan'
+                            },
+                            {
+                              'icon': Icons.apartment,
+                              'title': 'Instansi',
+                              'key': 'instansi'
+                            },
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: kIsWeb
           ? null
@@ -74,118 +189,149 @@ class DetailAlumniPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBackground() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.teal, Colors.tealAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildHeaderCard(AlumniController alumniController) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      color: Colors.teal.shade100,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.teal,
+              child: Text(
+                alumniController.detailAlumni!['nama_alumni']?[0]
+                        .toUpperCase() ??
+                    "-",
+                style: const TextStyle(
+                  fontSize: 40,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    alumniController.detailAlumni!['nama_alumni'] ??
+                        'Nama Tidak Ditemukan',
+                    style: const TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    'Stambuk: ${alumniController.detailAlumni!['stambuk'] ?? '-'}',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  Text(
+                    'Tahun Alumni: ${alumniController.detailAlumni!['tahun'] ?? '-'}',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      height: 250,
     );
   }
 
-  Widget _buildHeader(AlumniController alumniController) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundColor: Colors.white,
-          child: Text(
-            alumniController.detailAlumni!['nama_alumni']?[0].toUpperCase() ??
-                "-",
-            style: const TextStyle(
-              fontSize: 48,
-              color: Colors.teal,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          alumniController.detailAlumni!['nama_alumni'] ?? 'Nama Tidak Ditemukan',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Stambuk: ${alumniController.detailAlumni!['stambuk'] ?? '-'}',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-          ),
-        ),
-      ],
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20.0,
+        fontWeight: FontWeight.bold,
+        color: Colors.teal,
+      ),
     );
   }
 
   Widget _buildInfoSection(
-      AlumniController alumniController, List<String> hiddenFields) {
-    final List<Map<String, dynamic>> infoList = [
-      {'icon': Icons.calendar_today, 'title': 'Tahun Alumni', 'key': 'tahun'},
-      {'icon': Icons.school, 'title': 'Kampus Asal', 'key': 'kampus_asal'},
-      {'icon': Icons.home, 'title': 'Alamat', 'key': 'alamat'},
-      {'icon': Icons.phone, 'title': 'No Telepon', 'key': 'no_telepon'},
-      {'icon': Icons.favorite, 'title': 'Pasangan', 'key': 'pasangan'},
-      {'icon': Icons.work, 'title': 'Pekerjaan', 'key': 'pekerjaan'},
-      {'icon': Icons.person, 'title': 'Nama Laqob', 'key': 'nama_laqob'},
-      {'icon': Icons.cake, 'title': 'Tempat Tanggal Lahir', 'key': 'ttl'},
-      {'icon': Icons.location_city, 'title': 'Kecamatan', 'key': 'kecamatan'},
-      {'icon': Icons.apartment, 'title': 'Instansi', 'key': 'instansi'},
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: infoList.map((info) {
-              final key = info['key'];
-              final value = hiddenFields.contains(info['title'])
-                  ? 'Disembunyikan'
-                  : alumniController.detailAlumni![key] ?? '-';
-              return _buildInfoRow(info['icon'], info['title'], value);
-            }).toList(),
-          ),
-        ),
-      ),
+    AlumniController alumniController,
+    List<String> hiddenFields,
+    List<Map<String, dynamic>> infoList,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: infoList.map((info) {
+        final key = info['key'];
+        final value = hiddenFields.contains(info['title'])
+            ? 'Disembunyikan'
+            : alumniController.detailAlumni![key] ?? '-';
+        return _buildDetailRow(info['icon'], info['title'], value);
+      }).toList(),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String title, String value) {
+  Widget _buildDetailRow(IconData icon, String title, String value) {
+    final isHidden = value == 'Disembunyikan';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.teal, size: 28),
-          const SizedBox(width: 12),
+          Icon(icon, color: Colors.teal),
+          const SizedBox(width: 16),
           Expanded(
+            flex: 2,
             child: Text(
               '$title:',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 16.0,
+                color: Colors.black87,
               ),
             ),
           ),
           Expanded(
-            flex: 2,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.right,
+            flex: 3,
+            child: Row(
+              children: [
+                if (isHidden)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Disembunyikan',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                if (!isHidden)
+                  Expanded(
+                    child: Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black54,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

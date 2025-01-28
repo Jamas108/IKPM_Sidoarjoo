@@ -23,23 +23,7 @@ class ShowEventPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poster Event
-            if (event.poster.isNotEmpty)
-              Center(
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Image.network(
-                    event.poster,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
             const SizedBox(height: 20),
-            // Detail Event
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -50,11 +34,20 @@ class ShowEventPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Detail Event',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                    if (event.poster.isNotEmpty)
+                      Center(
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Image.network(
+                            event.poster,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     _buildDetailField('Nama Event', event.name),
                     const SizedBox(height: 16),

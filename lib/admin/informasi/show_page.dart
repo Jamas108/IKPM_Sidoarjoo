@@ -52,8 +52,7 @@ class _ShowInformasiPageState extends State<ShowInformasiPage> {
   // Memuat komentar untuk berita berdasarkan informasiId
   Future<void> _loadComments() async {
     try {
-      final comments =
-          await _commentController.fetchComments(widget.informasiId);
+      final comments = await _commentController.fetchComments(widget.informasiId);
       setState(() {
         _comments = comments;
       });
@@ -136,78 +135,69 @@ class _ShowInformasiPageState extends State<ShowInformasiPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // Gambar poster di tengah
-                      if (_berita!.image.isNotEmpty)
-                        Center(
-                          child: Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.network(
-                                _berita!.image,
-                                width: 300,
-                                height: 300,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                      // Detail informasi dalam kartu
+                      // Gambar poster di dalam Card bersama form input
                       Card(
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Detail Informasi',
-                                style: GoogleFonts.lato(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
+                              if (_berita!.image.isNotEmpty)
+                                Image.network(
+                                  _berita!.image,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.cover,
+                                ),
                               const SizedBox(height: 20),
-                              TextFormField(
-                                initialValue: _berita!.name,
-                                decoration: const InputDecoration(
-                                  labelText: 'Judul',
-                                  border: OutlineInputBorder(),
+                              // Form untuk menampilkan informasi dalam Card yang sama
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    TextFormField(
+                                      initialValue: _berita!.name,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Judul',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue: _berita!.date,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Tanggal',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue: _berita!.time,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Waktu',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      readOnly: true,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue: _berita!.description,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Deskripsi',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      maxLines: 5,
+                                      readOnly: true,
+                                    ),
+                                  ],
                                 ),
-                                readOnly: true,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                initialValue: _berita!.date,
-                                decoration: const InputDecoration(
-                                  labelText: 'Tanggal',
-                                  border: OutlineInputBorder(),
-                                ),
-                                readOnly: true,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                initialValue: _berita!.time,
-                                decoration: const InputDecoration(
-                                  labelText: 'Waktu',
-                                  border: OutlineInputBorder(),
-                                ),
-                                readOnly: true,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                initialValue: _berita!.description,
-                                decoration: const InputDecoration(
-                                  labelText: 'Deskripsi',
-                                  border: OutlineInputBorder(),
-                                ),
-                                maxLines: 5,
-                                readOnly: true,
                               ),
                             ],
                           ),

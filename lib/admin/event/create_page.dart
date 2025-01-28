@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:ikpm_sidoarjo/models/event_model.dart';
 import 'package:intl/intl.dart';
-import 'package:ikpm_sidoarjo/controllers/admin/event_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:ikpm_sidoarjo/controllers/admin/kegiatan_controller.dart';
 
 class AddEventPage extends StatefulWidget {
   const AddEventPage({Key? key}) : super(key: key);
@@ -63,7 +65,7 @@ class _AddEventPageState extends State<AddEventPage> {
     }
   }
 
-  Future<void> _saveEvent() async {
+  Future<void> _saveKegiatan() async {
     String name = nameController.text;
     String date = dateController.text;
     String time = timeController.text;
@@ -82,7 +84,8 @@ class _AddEventPageState extends State<AddEventPage> {
     }
 
     try {
-      await _eventController.addEvent(
+      // Add event to the backend
+      await _eventController.addKegiatan(
         name: name,
         date: date,
         time: time,
@@ -92,10 +95,22 @@ class _AddEventPageState extends State<AddEventPage> {
         imageName: _selectedImageName,
       );
 
+      // Return the new event to the previous page
+      Navigator.pop(
+          context,
+          EventModel(
+            id: 'newId', // You should get the actual ID from the backend response
+            name: name,
+            date: date,
+            time: time,
+            location: location,
+            description: description,
+            poster: 'posterPath', // If you have a poster, include its path here
+          ));
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Event berhasil ditambahkan')),
       );
-      Navigator.pop(context); // Kembali ke halaman sebelumnya
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal menyimpan event: $e')),
@@ -107,8 +122,11 @@ class _AddEventPageState extends State<AddEventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
-        backgroundColor: const Color(0xFF2C7566),
+        title: Text(
+          'Tambah Kegiatan',
+          style: GoogleFonts.lato(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -124,19 +142,9 @@ class _AddEventPageState extends State<AddEventPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Tambah Kegiatan Baru',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
                   _buildTextField(
                     controller: nameController,
-                    label: 'Nama Event',
+                    label: 'Nama Kegiatan',
                     icon: Icons.event,
                   ),
                   GestureDetector(
@@ -144,7 +152,7 @@ class _AddEventPageState extends State<AddEventPage> {
                     child: AbsorbPointer(
                       child: _buildTextField(
                         controller: dateController,
-                        label: 'Tanggal Event',
+                        label: 'Tanggal Kegiatan',
                         icon: Icons.calendar_today,
                       ),
                     ),
@@ -154,31 +162,27 @@ class _AddEventPageState extends State<AddEventPage> {
                     child: AbsorbPointer(
                       child: _buildTextField(
                         controller: timeController,
-                        label: 'Waktu Event',
+                        label: 'Waktu Kegiatan',
                         icon: Icons.access_time,
                       ),
                     ),
                   ),
                   _buildTextField(
                     controller: locationController,
-                    label: 'Lokasi Event',
+                    label: 'Lokasi Kegiatan',
                     icon: Icons.location_on,
                   ),
                   _buildTextField(
                     controller: descriptionController,
-                    label: 'Deskripsi Event',
+                    label: 'Deskripsi Kegiatan',
                     icon: Icons.description,
                     maxLines: 3,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _pickImageWeb,
-                    icon: const Icon(
-                      Icons.image,
-                      color: Colors.white,
-                    ),
                     label: const Text(
-                      'Upload Poster Kegiatan',
+                      'Unggah Poster Kegiatan',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -199,7 +203,7 @@ class _AddEventPageState extends State<AddEventPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saveEvent,
+                      onPressed: _saveKegiatan,
                       child: const Text(
                         'Tambah Kegiatan',
                         style: TextStyle(

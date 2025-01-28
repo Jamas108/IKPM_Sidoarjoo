@@ -47,26 +47,23 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
     }
   }
 
-  void _filterAlumni() {
-    setState(() {
-      _filteredAlumniList = _alumniList.where((alumni) {
-        final matchesYear =
-            _selectedYear == null || alumni.tahun == _selectedYear;
-        final matchesCampus =
-            _selectedCampus == null || alumni.kampusAsal == _selectedCampus;
-        final matchesKecamatan = _selectedKecamatan == null ||
-            alumni.kecamatan == _selectedKecamatan;
-        final matchesSearch = alumni.namaAlumni
-                ?.toLowerCase()
-                .contains(_searchQuery.toLowerCase()) ??
-            false;
+  void _filterAlumni() async {
+    try {
+      final filteredAlumni = await _alumniController.searchAlumni(
+        searchQuery: _searchQuery,
+        selectedYear: _selectedYear,
+        selectedCampus: _selectedCampus,
+        selectedKecamatan: _selectedKecamatan,
+      );
 
-        return matchesYear &&
-            matchesCampus &&
-            matchesKecamatan &&
-            matchesSearch;
-      }).toList();
-    });
+      setState(() {
+        _filteredAlumniList = filteredAlumni;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error searching alumni: $e')),
+      );
+    }
   }
 
   void _resetFilters() {
@@ -109,23 +106,15 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
   }
 
   Future<void> _deleteAlumni(String stambuk) async {
-    final url = Uri.parse(
-        'https://backend-ikpmsidoarjo.vercel.app/admin/alumni/$stambuk'); // Ganti dengan endpoint API Anda
     try {
-      final response = await http.delete(url);
-      if (response.statusCode == 200) {
-        setState(() {
-          _alumniList.removeWhere((alumni) => alumni.stambuk == stambuk);
-          _filterAlumni();
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Alumni berhasil dihapus')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal menghapus alumni')),
-        );
-      }
+      await _alumniController.deleteAlumni(stambuk);
+      setState(() {
+        _alumniList.removeWhere((alumni) => alumni.stambuk == stambuk);
+        _filterAlumni();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Alumni berhasil dihapus')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
@@ -133,7 +122,7 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
     }
   }
 
-  void _showPasswordVerificationDialog(String stambuk) {
+  void _PasswordVerification(String stambuk) {
     final TextEditingController passwordController = TextEditingController();
 
     showDialog(
@@ -173,7 +162,10 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                   );
                 }
               },
-              child: const Text('Lanjutkan', style: TextStyle(color: Colors.white),),
+              child: const Text(
+                'Lanjutkan',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -245,8 +237,8 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
-                          _filterAlumni();
                         });
+                        _filterAlumni();
                       },
                     ),
                     const SizedBox(height: 20),
@@ -305,22 +297,22 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Filter Kecamatan"),
-                            value: _selectedKecamatan,
+                            hint: const Text("Filter Tahun"),
+                            value: _selectedYear,
                             onChanged: (value) {
                               setState(() {
-                                _selectedKecamatan = value;
-                                _filterAlumni();
+                                _selectedYear = value;
                               });
+                              _filterAlumni();
                             },
                             items: _alumniList
-                                .map((alumni) => alumni.kecamatan)
+                                .map((alumni) => alumni.tahun)
                                 .toSet()
                                 .toList()
-                                .map((kecamatan) {
+                                .map((tahun) {
                               return DropdownMenuItem<String>(
-                                value: kecamatan,
-                                child: Text(kecamatan ?? '-'),
+                                value: tahun,
+                                child: Text(tahun ?? '-'),
                               );
                             }).toList(),
                           ),
@@ -356,14 +348,13 @@ class _AlumniPageAdminState extends State<AlumniPageAdmin> {
                           DataColumn(label: Text('Nama')),
                           DataColumn(label: Text('Stambuk')),
                           DataColumn(label: Text('Kampus')),
-                          DataColumn(label: Text('Kecamatan')),
                           DataColumn(label: Text('Aksi')),
                         ],
                         source: _AlumniDataSource(
                           _filteredAlumniList,
                           context,
                           _showDeleteConfirmation,
-                          _showPasswordVerificationDialog, // Callback hapus
+                          _PasswordVerification, // Callback hapus
                         ),
                         rowsPerPage: _rowsPerPage,
                         availableRowsPerPage: const [5, 10, 15],
@@ -410,16 +401,12 @@ class _AlumniDataSource extends DataTableSource {
           child: Text(alumni.namaAlumni ?? '-'),
         )),
         DataCell(SizedBox(
-          width: 100, // Kolom "Stambuk"
+          width: 80, // Kolom "Stambuk"
           child: Text(alumni.stambuk ?? '-'),
         )),
         DataCell(SizedBox(
-          width: 480, // Kolom "Kampus"
+          width: 700, // Kolom "Kampus"
           child: Text(alumni.kampusAsal ?? '-'),
-        )),
-        DataCell(SizedBox(
-          width: 190, // Kolom "Kecamatan"
-          child: Text(alumni.kecamatan ?? '-'),
         )),
         DataCell(SizedBox(
           width: 160, // Kolom "Aksi"
@@ -430,7 +417,7 @@ class _AlumniDataSource extends DataTableSource {
                 icon: const Icon(Icons.visibility, color: Colors.green),
                 onPressed: () {
                   GoRouter.of(context)
-                      .go('/admin/alumni/detail/${alumni.stambuk}');
+                      .go('/admin/alumni/details/${alumni.stambuk}');
                 },
               ),
               IconButton(

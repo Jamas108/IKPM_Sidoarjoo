@@ -1,10 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:ikpm_sidoarjo/controllers/admin/participant_controller.dart';
 
 class EventParticipantsPage extends StatefulWidget {
   final String kegiatanId;
@@ -21,6 +17,8 @@ class EventParticipantsPage extends StatefulWidget {
 }
 
 class _EventParticipantsPageState extends State<EventParticipantsPage> {
+  final ParticipantController _participantController =
+      ParticipantController('https://backend-ikpmsidoarjo.vercel.app');
   List<Map<String, String>> participantsList = [];
   List<Map<String, String>> filteredParticipantsList = [];
   bool isLoading = true;
@@ -30,124 +28,93 @@ class _EventParticipantsPageState extends State<EventParticipantsPage> {
   @override
   void initState() {
     super.initState();
-    fetchParticipants();
+    _fetchParticipants();
   }
 
-  Future<void> fetchParticipants() async {
+  Future<void> _fetchParticipants() async {
     try {
-      final response = await http.get(
-          Uri.parse('https://backend-ikpmsidoarjo.vercel.app/participations/${widget.kegiatanId}'));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        setState(() {
-          participantsList = jsonData.map((participant) {
-            return {
-              'id': participant['_id']?.toString() ?? 'Unknown',
-              'name': participant['name']?.toString() ?? 'Unknown',
-              'stambuk': participant['stambuk']?.toString() ?? 'Unknown',
-            };
-          }).toList();
-          filteredParticipantsList = List.from(participantsList);
-          isLoading = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load participants')),
-        );
-        setState(() {
-          isLoading = false;
-        });
-      }
+      final participants =
+          await _participantController.fetchParticipants(widget.kegiatanId);
+      setState(() {
+        participantsList = participants;
+        filteredParticipantsList = List.from(participants);
+        isLoading = false;
+        if (participants.isEmpty) {
+          noParticipantsFound = true;
+        }
+      });
     } catch (e) {
-      print('Error fetching participants: $e');
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  void filterParticipants(String query) {
+  void _filterParticipants(String query) {
     setState(() {
       searchQuery = query;
-      if (query.isEmpty) {
-        filteredParticipantsList = List.from(participantsList);
-      } else {
-        filteredParticipantsList = participantsList
-            .where((participant) =>
-                participant['name']!
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                participant['stambuk']!
-                    .toLowerCase()
-                    .contains(query.toLowerCase()))
-            .toList();
-      }
-
-      Future.delayed(const Duration(seconds: 3), () {
-        if (filteredParticipantsList.isEmpty) {
-          setState(() {
-            noParticipantsFound = true;
-          });
-        } else {
-          setState(() {
-            noParticipantsFound = false;
-          });
-        }
-      });
+      filteredParticipantsList =
+          _participantController.filterParticipants(participantsList, query);
     });
   }
 
-  Future<void> generateAndDownloadPdf() async {
-    final pdf = pw.Document();
+  void _downloadPdf() async {
+    if (filteredParticipantsList.isNotEmpty) {
+      await _participantController.generateAndDownloadPdf(
+        eventName: widget.eventName,
+        participants: filteredParticipantsList,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Berhasil Cetak PDF!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tidak ada data peserta untuk dicetak menjadi PDF.')),
+      );
+    }
+  }
 
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'Peserta Kegiatan: ${widget.eventName}',
-              style: pw.TextStyle(
-                fontSize: 24,
-                fontWeight: pw.FontWeight.bold,
-              ),
+  // Function to delete a participant with confirmation
+  Future<void> _deleteParticipant(String participantId) async {
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text('Apakah Anda yakin ingin menghapus peserta ini?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed cancel
+              },
+              child: const Text('Batal'),
             ),
-            pw.SizedBox(height: 16),
-            pw.Table.fromTextArray(
-              border: pw.TableBorder.all(),
-              headers: ['No', 'Stambuk', 'Nama', 'TTD'],
-              headerStyle: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 14,
-              ),
-              cellAlignment: pw.Alignment.center,
-              data: filteredParticipantsList.asMap().entries.map((entry) {
-                final index = entry.key + 1;
-                final participant = entry.value;
-                return [
-                  index.toString(),
-                  participant['stambuk']!,
-                  participant['name']!,
-                  '', // Kosong untuk kolom TTD
-                ];
-              }).toList(),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed delete
+              },
+              child: const Text('Hapus'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
 
-    if (kIsWeb) {
-      // Untuk platform web
-      final bytes = await pdf.save();
-      await Printing.sharePdf(
-          bytes: bytes, filename: '${widget.eventName}_Participants.pdf');
-    } else {
-      // Untuk Android dan iOS
-      await Printing.layoutPdf(
-        onLayout: (format) async => pdf.save(),
-      );
+    if (confirmDelete == true) {
+      try {
+        await _participantController.deleteParticipant(participantId);
+        setState(() {
+          filteredParticipantsList.removeWhere(
+              (participant) => participant['id'] == participantId);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Participant deleted!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete participant: $e')),
+        );
+      }
     }
   }
 
@@ -161,6 +128,13 @@ class _EventParticipantsPageState extends State<EventParticipantsPage> {
         ),
         backgroundColor: const Color(0xFF2C7566),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: _downloadPdf,
+            tooltip: 'Download PDF',
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -169,9 +143,9 @@ class _EventParticipantsPageState extends State<EventParticipantsPage> {
               child: Column(
                 children: [
                   TextField(
-                    onChanged: filterParticipants,
+                    onChanged: _filterParticipants,
                     decoration: const InputDecoration(
-                      labelText: 'Search Participant',
+                      labelText: 'Cari Peserta',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -181,12 +155,12 @@ class _EventParticipantsPageState extends State<EventParticipantsPage> {
                     const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
-                        'Peserta Tidak Ditemukan',
+                        'Belum ada peserta kegiatan',
                         style: TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ),
                   filteredParticipantsList.isEmpty && !noParticipantsFound
-                      ? const Center(child: Text('No participants available'))
+                      ? const Center(child: Text('Belum Ada Peserta Kegiatan'))
                       : Expanded(
                           child: ListView.builder(
                             itemCount: filteredParticipantsList.length,
@@ -199,38 +173,20 @@ class _EventParticipantsPageState extends State<EventParticipantsPage> {
                                   title: Text('Nama: ${participant['name']}'),
                                   subtitle: Text(
                                       'Stambuk: ${participant['stambuk']}'),
+                                  trailing: IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      _deleteParticipant(participant['id']!);
+                                    },
+                                  ),
                                 ),
                               );
                             },
                           ),
                         ),
-                  const SizedBox(height: 16),
-                  // Tombol Download PDF
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (filteredParticipantsList.isNotEmpty) {
-                        generateAndDownloadPdf();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('PDF Downloaded!')),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('No participants to download.')),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.download),
-                    label: const Text('Download PDF'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2C7566), // Warna tombol
-                      foregroundColor: Colors.white, // Warna teks tombol
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 20,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),

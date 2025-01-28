@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ikpm_sidoarjo/controllers/admin/event_controller.dart';
+import 'package:ikpm_sidoarjo/controllers/admin/kegiatan_controller.dart';
 import 'package:ikpm_sidoarjo/models/event_model.dart';
 import 'package:ikpm_sidoarjo/admin/layouts/sidebar.dart';
 import 'package:go_router/go_router.dart';
@@ -15,8 +15,10 @@ class EventPageAdmin extends StatefulWidget {
 class _EventPageAdminState extends State<EventPageAdmin> {
   final EventController _eventController = EventController();
   List<EventModel> _eventList = [];
-  List<EventModel> _filteredEventList = [];
+  List<EventModel> _filteredKegiatanList = [];
   bool _isLoading = true;
+  int _rowsPerPage = 7; // Number of rows per page for pagination
+  int _currentPage = 0; // Current page for pagination
 
   @override
   void initState() {
@@ -26,10 +28,10 @@ class _EventPageAdminState extends State<EventPageAdmin> {
 
   Future<void> _loadEvents() async {
     try {
-      final events = await _eventController.fetchEvents();
+      final events = await _eventController.fetchKegiatan();
       setState(() {
         _eventList = events;
-        _filteredEventList = List.from(events);
+        _filteredKegiatanList = List.from(events);
         _isLoading = false;
       });
     } catch (e) {
@@ -44,25 +46,52 @@ class _EventPageAdminState extends State<EventPageAdmin> {
 
   void _onSearch(String query) {
     setState(() {
-      _filteredEventList = _eventController.filterEvents(_eventList, query);
+      _filteredKegiatanList = _eventController.filterKegiatan(_eventList, query);
     });
   }
 
-  Future<void> _onDeleteEvent(String kegiatanId) async {
-    try {
-      final updatedEvents =
-          await _eventController.deleteEventAndRefresh(kegiatanId, _eventList);
-      setState(() {
-        _eventList = updatedEvents;
-        _filteredEventList = List.from(updatedEvents);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event deleted successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete event: $e')),
-      );
+  // Show delete confirmation dialog
+  Future<void> _onDeleteKegiatan(String kegiatanId) async {
+    bool? deleteConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text('Apakah Anda yakin ingin menghapus kegiatan ini?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed cancel
+              },
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed delete
+              },
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (deleteConfirmed == true) {
+      try {
+        final updatedEvents = await _eventController.deleteKegiatanAndRefresh(
+            kegiatanId, _eventList);
+        setState(() {
+          _eventList = updatedEvents;
+          _filteredKegiatanList = List.from(updatedEvents);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data Kegiatan Berhasil Dihapus')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete event: $e')),
+        );
+      }
     }
   }
 
@@ -72,7 +101,7 @@ class _EventPageAdminState extends State<EventPageAdmin> {
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Added horizontal padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -90,13 +119,16 @@ class _EventPageAdminState extends State<EventPageAdmin> {
                       ElevatedButton(
                         onPressed: () async {
                           final newEvent = await context.push(
-                              '/admin/events/create'); // Navigasi ke AddEventPage
+                              '/admin/events/create'); // Navigate to AddEventPage
 
                           if (newEvent != null && newEvent is EventModel) {
                             setState(() {
                               _eventList.add(newEvent);
-                              _filteredEventList.add(newEvent);
+                              _filteredKegiatanList.add(newEvent);
                             });
+
+                            // Reload the event list after adding a new event
+                            await _loadEvents();
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -120,7 +152,7 @@ class _EventPageAdminState extends State<EventPageAdmin> {
                   TextField(
                     onChanged: _onSearch,
                     decoration: const InputDecoration(
-                      labelText: 'Search Event',
+                      labelText: 'Cari Kegiatan',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -136,134 +168,41 @@ class _EventPageAdminState extends State<EventPageAdmin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: DataTable(
-                            columnSpacing: 20,
-                            headingRowHeight: 56,
-                            horizontalMargin: 16,
-                            columns: [
-                              DataColumn(
-                                  label: Text(
-                                'No',
-                                style: GoogleFonts.lato(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataColumn(
-                                  label: Text(
-                                'Name',
-                                style: GoogleFonts.lato(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataColumn(
-                                  label: Text(
-                                'Date',
-                                style: GoogleFonts.lato(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataColumn(
-                                  label: Text(
-                                'Location',
-                                style: GoogleFonts.lato(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataColumn(
-                                  label: Text(
-                                'Actions',
-                                style: GoogleFonts.lato(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                            ],
-                            rows:
-                                _filteredEventList.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final event = entry.value;
-                              return DataRow(cells: [
-                                DataCell(Text('${index + 1}')), // Nomor urut
-                                DataCell(Text(event.name)),
-                                DataCell(Text(event.date)),
-                                DataCell(Text(event.location)),
-                                DataCell(Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.visibility,
-                                          color: Colors.blue),
-                                      onPressed: () {
-                                        context.go(
-                                            '/admin/events/detail/${event.id}',
-                                            extra: event);
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.blue),
-                                      onPressed: () {
-                                        context.go(
-                                          '/admin/events/edit/${event.id}',
-                                          extra: event,
-                                        );
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.red),
-                                      onPressed: () async {
-                                        final confirmDelete =
-                                            await showDialog<bool>(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Konfirmasi Hapus Kegiatan'),
-                                            content: const Text(
-                                                'Apakah anda yakin ingin menghapus kegiatan ini?'),
-                                            actions: [
-                                              TextButton(
-                                                child: const Text('Batal'),
-                                                onPressed: () =>
-                                                    Navigator.of(context)
-                                                        .pop(false),
-                                              ),
-                                              TextButton(
-                                                child: const Text('Hapus'),
-                                                onPressed: () =>
-                                                    Navigator.of(context)
-                                                        .pop(true),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-
-                                        if (confirmDelete == true) {
-                                          try {
-                                            await _onDeleteEvent(event.id);
-                                          } catch (e) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Failed to delete event: $e')),
-                                            );
-                                          }
-                                        }
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.people,
-                                          color: Colors.green),
-                                      onPressed: () {
-                                        context.go(
-                                          '/admin/events/${event.id}/participants',
-                                          extra: {'eventName': event.name},
-                                        );
-                                      },
-                                    ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Added padding here as well
+                        child: _filteredKegiatanList.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  'Data Kegiatan Tidak Ditemukan.',
+                                  style: TextStyle(fontSize: 18, color: Colors.red),
+                                ),
+                              )
+                            : SizedBox(
+                                width: double.infinity,
+                                child: PaginatedDataTable(
+                                  rowsPerPage: _filteredKegiatanList.length < _rowsPerPage
+                                      ? _filteredKegiatanList.length
+                                      : _rowsPerPage,
+                                  onPageChanged: (page) {
+                                    setState(() {
+                                      _currentPage = page;
+                                    });
+                                  },
+                                  columns: const [
+                                    DataColumn(
+                                        label: Text('No', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    DataColumn(
+                                        label: Text('Nama Kegiatan', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    DataColumn(
+                                        label: Text('Tanggal', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    DataColumn(
+                                        label: Text('Lokasi', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    DataColumn(
+                                        label: Text('Aksi', style: TextStyle(fontWeight: FontWeight.bold))),
                                   ],
-                                )),
-                              ]);
-                            }).toList(),
-                          ),
-                        ),
+                                  source: _EventDataSource(
+                                      _filteredKegiatanList, _onDeleteKegiatan, context, _loadEvents, setState),
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -272,4 +211,80 @@ class _EventPageAdminState extends State<EventPageAdmin> {
             ),
     );
   }
+}
+
+class _EventDataSource extends DataTableSource {
+  final List<EventModel> _events;
+  final Function(String) _onDelete;
+  final BuildContext _context;
+  final Function() _reloadEvents;
+  final Function(VoidCallback) _setState;
+
+  _EventDataSource(this._events, this._onDelete, this._context, this._reloadEvents, this._setState);
+
+  @override
+  DataRow getRow(int index) {
+    final event = _events[index];
+    return DataRow(cells: [
+      DataCell(Text('${index + 1}')),
+      DataCell(Text(event.name)),
+      DataCell(Text(event.date)),
+      DataCell(Text(event.location)),
+      DataCell(Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.visibility, color: Color.fromARGB(255, 255, 170, 0)),
+            onPressed: () {
+              _context.go('/admin/events/detail/${event.id}', extra: event);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () async {
+              final updatedEvent = await _context.push(
+                '/admin/events/edit/${event.id}',
+                extra: event,
+              );
+
+              if (updatedEvent != null && updatedEvent is EventModel) {
+                _setState(() {
+                  // Find and replace the old event with the updated one in the list
+                  int index = _events.indexWhere((e) => e.id == updatedEvent.id);
+                  if (index != -1) {
+                    _events[index] = updatedEvent;
+                  }
+                });
+
+                // Optionally, reload the event list after editing
+                _reloadEvents();
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _onDelete(event.id),
+          ),
+          IconButton(
+            icon: const Icon(Icons.people, color: Colors.green),
+            onPressed: () {
+              _context.go(
+                '/admin/events/${event.id}/participants',
+                extra: {'eventName': event.name},
+              );
+            },
+          ),
+        ],
+      )),
+    ]);
+  }
+
+  @override
+  int get rowCount => _events.length;
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
 }

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../auth/auth_provider.dart';
-import '../controllers/event_controller.dart';
+import '../controllers/kegiatan_controller.dart';
 import '../models/event_model.dart';
 import '../layouts/navbar_layout.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailEvent extends StatelessWidget {
   final EventModel event;
@@ -32,7 +33,8 @@ class DetailEvent extends StatelessWidget {
 
     try {
       // Mendaftarkan user ke event melalui controller
-      await eventController.registerForEvent(userId: stambuk, kegiatanId: event.id);
+      await eventController.registerForEvent(
+          userId: stambuk, kegiatanId: event.id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Berhasil mendaftar untuk kegiatan!')),
       );
@@ -54,12 +56,26 @@ class DetailEvent extends StatelessWidget {
           ? const Navbar() // Navbar untuk Web
           : AppBar(
               title: const Text(
-                'Detail Event',
-                style: TextStyle(color: Colors.black),
+                'Detail Kegiatan',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                ),
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+              iconTheme: const IconThemeData(color: Colors.white),
               elevation: 0,
               automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  GoRouter.of(context).go('/event');
+                },
+              ),
             ),
       body: SingleChildScrollView(
         child: Column(
@@ -71,8 +87,10 @@ class DetailEvent extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
                 event.poster, // URL poster dari EventModel
-                width: MediaQuery.of(context).size.width * 0.9, // 90% lebar layar
-                height: MediaQuery.of(context).size.height * 0.5, // 50% tinggi layar
+                width:
+                    MediaQuery.of(context).size.width * 0.9, // 90% lebar layar
+                height: MediaQuery.of(context).size.height *
+                    0.5, // 50% tinggi layar
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => const Center(
                   child: Text(
@@ -99,7 +117,8 @@ class DetailEvent extends StatelessWidget {
             // Lokasi dan tanggal
             Center(
               child: Row(
-                mainAxisSize: MainAxisSize.min, // Sesuaikan lebar konten dengan isi
+                mainAxisSize:
+                    MainAxisSize.min, // Sesuaikan lebar konten dengan isi
                 children: [
                   // Lokasi
                   Row(
@@ -108,7 +127,8 @@ class DetailEvent extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         event.location, // Lokasi dari EventModel
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black87),
                       ),
                     ],
                   ),
@@ -120,7 +140,8 @@ class DetailEvent extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         event.date, // Tanggal dari EventModel
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black87),
                       ),
                     ],
                   ),
@@ -165,7 +186,8 @@ class DetailEvent extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
                         event.description, // Deskripsi dari EventModel
-                        style: const TextStyle(fontSize: 16, color: Colors.black54),
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54),
                         textAlign: TextAlign.justify,
                       ),
                     ),
@@ -179,8 +201,11 @@ class DetailEvent extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _registerForEvent(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: stambuk != null ? const Color.fromARGB(255, 23, 114, 110) : Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+                  backgroundColor: stambuk != null
+                      ? const Color.fromARGB(255, 23, 114, 110)
+                      : Colors.orange,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

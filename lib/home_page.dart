@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart'; // Untuk mendeteksi Web
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../layouts/navbar_layout.dart'; // Navbar untuk Web
-import '../layouts/bottom_bar.dart'; // BottomBar untuk Android
+import '../layouts/navbar_layout.dart';
+import '../layouts/bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,24 +35,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Deteksi apakah platform adalah Web
     final bool isWeb = kIsWeb;
 
     return Scaffold(
       appBar: isWeb
-          ? const Navbar() // Gunakan Navbar untuk Web
+          ? const Navbar()
           : AppBar(
-              title: const Text("Halaman Home"),
+              title: const Text(
+                "Beranda",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20, // Ukuran font lebih besar
+                  fontWeight:
+                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
+                  letterSpacing: 1.2, // Memberikan spasi antar huruf
+                ),
+              ),
               backgroundColor: const Color.fromARGB(255, 23, 114, 110),
             ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
           children: [
-            // Banner Full Height dengan Background Gambar
             Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.height, // Full height
+              height: MediaQuery.of(context).size.height,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/ikpmsidoarjobanner.jpg'),
@@ -60,23 +68,34 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               child: Container(
-                color: Colors.black.withOpacity(0.5), // Overlay gelap untuk teks
+                color: Colors.black.withOpacity(0.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "SELAMAT DATANG DI IKPM SIDOARJO",
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Center(
+                      child: const Text(
+                        "SELAMAT DATANG DI IKPM SIDOARJO",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "Berisi tentang sekumpulan informasi tentang alumni, kegiatan serta berita tentang Keluarga IKPM Cabang Sidoarjo.\nSemoga bermanfaat dan menambah wawasan anda :)",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    Padding(
+                      padding: MediaQuery.of(context).size.width < 600
+                          ? const EdgeInsets.symmetric(
+                              horizontal: 16.0) // Padding ketika layar kecil
+                          : const EdgeInsets.symmetric(
+                              horizontal:
+                                  32.0), // Padding lebih besar untuk layar besar
+                      child: const Text(
+                        "Berisi tentang sekumpulan informasi tentang alumni, kegiatan serta berita tentang Keluarga IKPM Cabang Sidoarjo.\nSemoga bermanfaat dan menambah wawasan anda :)",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                     ),
                     const SizedBox(height: 32),
                     Row(
@@ -84,11 +103,11 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // Tambahkan navigasi ke halaman lain
+                            context.go('/login'); // Arahkan ke halaman login
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFFFFF), // Putih
-                            foregroundColor: const Color(0xFF2C7566), // Hijau teks
+                            backgroundColor: const Color(0xFFFFFFFF),
+                            foregroundColor: const Color(0xFF2C7566),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 12.0),
                             shape: RoundedRectangleBorder(
@@ -104,7 +123,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // Header Card Section dengan Animasi
             AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: _scrollPosition > 100 ? 1 : 0,
@@ -121,58 +139,68 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // Card Section
             AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: _scrollPosition > 200 ? 1 : 0,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: isWeb ? 4 : 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  children: const [
-                    _FeatureCard(
-                      icon: Icons.desktop_mac,
-                      title: "Data Alumni",
-                    ),
-                    _FeatureCard(
-                      icon: Icons.event,
-                      title: "Agenda Kegiatan",
-                    ),
-                    _FeatureCard(
-                      icon: Icons.newspaper,
-                      title: "Berita Terkini",
-                    ),
-                    _FeatureCard(
-                      icon: Icons.contact_page,
-                      title: "Kontak Kami",
-                    ),
-                  ],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Menentukan jumlah kolom berdasarkan lebar layar
+                    int crossAxisCount = constraints.maxWidth > 800
+                        ? 4
+                        : constraints.maxWidth > 600
+                            ? 3
+                            : 2;
+
+                    return GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32.0), // Padding kiri dan kanan
+                      children: [
+                        _FeatureCard(
+                          icon: Icons.desktop_mac,
+                          title: "Data Alumni",
+                          onTap: () {
+                            context.go('/alumni');
+                          },
+                        ),
+                        _FeatureCard(
+                          icon: Icons.event,
+                          title: "Agenda Kegiatan",
+                          onTap: () {
+                            context.go('/event');
+                          },
+                        ),
+                        _FeatureCard(
+                          icon: Icons.newspaper,
+                          title: "Berita Terkini",
+                          onTap: () {
+                            context.go('/informasi');
+                          },
+                        ),
+                        _FeatureCard(
+                          icon: Icons.contact_page,
+                          title: "Kritik dan Saran",
+                          onTap: () {
+                            context.go('/kritik');
+                          },
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
-            // Statistik Section
             AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: _scrollPosition > 400 ? 1 : 0,
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        _StatisticCard(title: "Alumni", count: 1200),
-                        _StatisticCard(title: "Kegiatan", count: 45),
-                        _StatisticCard(title: "Berita", count: 30),
-                      ],
-                    ),
-                  ),
-                  // Header "TENTANG IKPM SIDOARJO"
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
@@ -184,64 +212,59 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // Deskripsi di bawah header
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal:
+                            32.0), // Padding kiri dan kanan seperti pada feature card
+                    child: const Text(
                       "Website ini dibuat untuk memberikan informasi terkait data alumni, kegiatan, serta berita terkini yang berhubungan dengan IKPM Sidoarjo. Kami berharap website ini menjadi sarana yang bermanfaat untuk Anda.",
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.justify, // Teks di-justify
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
                     ),
                   ),
-                  // Header "KONTAK KAMI"
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      "KONTAK KAMI",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  // Card Kontak Kami
+                  const SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: isWeb ? 4 : 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      children: const [
-                        _FeatureCard(
-                          icon: Icons.phone,
-                          title: "Telepon",
-                        ),
-                        _FeatureCard(
-                          icon: Icons.call,
-                          title: "WhatsApp",
-                        ),
-                        _FeatureCard(
-                          icon: Icons.camera,
-                          title: "Instagram",
-                        ),
-                        _FeatureCard(
-                          icon: Icons.facebook,
-                          title: "Facebook",
-                        ),
-                      ],
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(3, (index) {
+                            return Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: _ContactCard(
+                                  icon: index == 0
+                                      ? Icons.phone
+                                      : index == 1
+                                          ? Icons.email
+                                          : Icons.location_on,
+                                  title: index == 0
+                                      ? "Telepon"
+                                      : index == 1
+                                          ? "Email"
+                                          : "Lokasi",
+                                  content: index == 0
+                                      ? "+62 123 4567 890"
+                                      : index == 1
+                                          ? "info@ikpmsidoarjo.com"
+                                          : "Sidoarjo, Jawa Timur",
+                                ),
+                              ),
+                            );
+                          }),
+                        );
+                      },
                     ),
                   ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
-            // Footer
             Container(
               width: double.infinity,
               color: const Color(0xFF2C7566),
@@ -257,7 +280,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: isWeb
-          ? null // Tidak gunakan BottomBar pada Web
+          ? null
           : BottomBar(
               currentIndex: _currentIndex,
               onTap: (index) {
@@ -270,50 +293,93 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Widget untuk Card pada bagian fitur
-class _FeatureCard extends StatelessWidget {
+class _FeatureCard extends StatefulWidget {
   final IconData icon;
   final String title;
+  final VoidCallback onTap;
 
-  const _FeatureCard({required this.icon, required this.title, Key? key})
-      : super(key: key);
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_FeatureCard> createState() => _FeatureCardState();
+}
+
+class _FeatureCardState extends State<_FeatureCard> {
+  bool _isHovering = false;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF2C7566), // Warna hijau
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: Colors.white,
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          _isHovering = true;
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          _isHovering = false;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        transform: _isHovering
+            ? Matrix4.identity()
+                .scaled(1.02) // Gunakan scaled() alih-alih chaining
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 255, 248, 255),
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(
+            color: const Color.fromARGB(255, 43, 117, 101),
+            width: 2,
+          ),
+          boxShadow: _isHovering
+              ? [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [],
+        ),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  widget.icon,
+                  size: 48,
+                  color: const Color.fromARGB(255, 43, 117, 101),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 43, 117, 101),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Widget untuk Statistik
 class _StatisticCard extends StatelessWidget {
   final String title;
   final int count;
@@ -339,6 +405,59 @@ class _StatisticCard extends StatelessWidget {
           style: const TextStyle(fontSize: 16, color: Colors.grey),
         ),
       ],
+    );
+  }
+}
+
+class _ContactCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String content;
+
+  const _ContactCard({
+    required this.icon,
+    required this.title,
+    required this.content,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        width: MediaQuery.of(context).size.width *
+            0.25, // Responsif: Lebar card disesuaikan dengan lebar layar
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 48,
+              color: const Color.fromARGB(255, 43, 117, 101),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              content,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

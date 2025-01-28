@@ -10,7 +10,7 @@ class EventController {
   final String baseUrl = 'https://backend-ikpmsidoarjo.vercel.app/kegiatans';
 
   // Fetch all events
-  Future<List<EventModel>> fetchEvents() async {
+  Future<List<EventModel>> fetchKegiatan() async {
     final response = await http.get(Uri.parse(baseUrl));
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -21,7 +21,7 @@ class EventController {
   }
 
   // Delete an event and refresh list
-  Future<List<EventModel>> deleteEventAndRefresh(
+  Future<List<EventModel>> deleteKegiatanAndRefresh(
       String kegiatanId, List<EventModel> events) async {
     final response = await http.delete(Uri.parse('$baseUrl/$kegiatanId'));
     if (response.statusCode == 200) {
@@ -32,7 +32,7 @@ class EventController {
   }
 
   // Search events by query
-  List<EventModel> filterEvents(List<EventModel> events, String query) {
+  List<EventModel> filterKegiatan(List<EventModel> events, String query) {
     if (query.isEmpty) {
       return events;
     }
@@ -45,7 +45,7 @@ class EventController {
   }
 
   // Add a new event
-  Future<void> addEvent({
+  Future<void> addKegiatan({
     required String name,
     required String date,
     required String time,
@@ -80,7 +80,7 @@ class EventController {
   }
 
   // Update an event
-  Future<void> updateEvent({
+  Future<void> updateKegiatan({
     required String kegiatanId,
     required String name,
     required String date,

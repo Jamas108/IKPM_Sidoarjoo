@@ -22,8 +22,8 @@ class AlumniController with ChangeNotifier {
   // Fungsi untuk mengambil data alumni
   Future<void> fetchAlumniData() async {
     try {
-      final response =
-          await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni'));
+      final response = await http
+          .get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni'));
       if (response.statusCode == 200) {
         alumniData = json.decode(response.body);
         filteredAlumniData = alumniData; // Awalnya tampilkan semua data
@@ -107,8 +107,8 @@ class AlumniController with ChangeNotifier {
       isDetailLoading = true;
       notifyListeners();
 
-      final response =
-          await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
+      final response = await http.get(
+          Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
@@ -134,5 +134,35 @@ class AlumniController with ChangeNotifier {
     detailAlumni = null;
     isDetailLoading = false;
     notifyListeners();
+  }
+
+  // Getter untuk pilihan tahun (diurutkan dari terkecil ke terbesar)
+  List<String> get sortedTahunList {
+    return alumniData
+        .map((e) => e['tahun']?.toString() ?? '') // Konversi ke String
+        .where((tahun) => tahun.isNotEmpty) // Hapus entri kosong
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.compareTo(b)); // Urutkan dari terkecil ke terbesar
+  }
+
+// Getter untuk pilihan kampus asal (diurutkan alfabetis)
+  List<String> get sortedPondokList {
+    return alumniData
+        .map((e) => e['kampus_asal']?.toString() ?? '')
+        .where((pondok) => pondok.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.compareTo(b)); // Urutkan alfabetis
+  }
+
+// Getter untuk pilihan kecamatan (diurutkan alfabetis)
+  List<String> get sortedKecamatanList {
+    return alumniData
+        .map((e) => e['kecamatan']?.toString() ?? '')
+        .where((kecamatan) => kecamatan.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.compareTo(b)); // Urutkan alfabetis
   }
 }

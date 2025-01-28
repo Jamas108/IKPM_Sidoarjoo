@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ikpm_sidoarjo/controllers/admin/alumni_controller.dart';
 
 class EditAlumniPage extends StatefulWidget {
   final String stambuk; // ID atau Stambuk alumni
@@ -11,6 +12,7 @@ class EditAlumniPage extends StatefulWidget {
 }
 
 class _EditAlumniPageState extends State<EditAlumniPage> {
+  final AlumniController _alumniController = AlumniController();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _tahunController = TextEditingController();
@@ -29,34 +31,26 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
   @override
   void initState() {
     super.initState();
-    _loadAlumniData();
+    _loadAlumniById();
   }
 
-  Future<void> _loadAlumniData() async {
+  Future<void> _loadAlumniById() async {
     try {
-      const String apiUrl =
-          'https://backend-ikpmsidoarjo.vercel.app/alumni'; // Ganti URL dengan endpoint backend Anda
-      final response = await http.get(Uri.parse('$apiUrl/${widget.stambuk}'));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _namaController.text = data['nama'] ?? '';
-          _tahunController.text = data['tahun'] ?? '';
-          _kampusController.text = data['kampus_asal'] ?? '';
-          _alamatController.text = data['alamat'] ?? '';
-          _noTeleponController.text = data['no_telepon'] ?? '';
-          _pasanganController.text = data['pasangan'] ?? '';
-          _pekerjaanController.text = data['pekerjaan'] ?? '';
-          _namaLaqobController.text = data['nama_laqob'] ?? '';
-          _ttlController.text = data['ttl'] ?? '';
-          _kecamatanController.text = data['kecamatan'] ?? '';
-          _instansiController.text = data['instansi'] ?? '';
-          _isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load alumni data');
-      }
+      final alumni = await _alumniController.loadAlumniById(widget.stambuk);
+      setState(() {
+        _namaController.text = alumni['nama'] ?? '';
+        _tahunController.text = alumni['tahun'] ?? '';
+        _kampusController.text = alumni['kampus_asal'] ?? '';
+        _alamatController.text = alumni['alamat'] ?? '';
+        _noTeleponController.text = alumni['no_telepon'] ?? '';
+        _pasanganController.text = alumni['pasangan'] ?? '';
+        _pekerjaanController.text = alumni['pekerjaan'] ?? '';
+        _namaLaqobController.text = alumni['nama_laqob'] ?? '';
+        _ttlController.text = alumni['ttl'] ?? '';
+        _kecamatanController.text = alumni['kecamatan'] ?? '';
+        _instansiController.text = alumni['instansi'] ?? '';
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +59,7 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
     }
   }
 
-  Future<void> _submitForm() async {
+  Future<void> _updateAlumni() async {
     if (_formKey.currentState!.validate()) {
       final alumniData = {
         'nama': _namaController.text,
@@ -82,22 +76,11 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
       };
 
       try {
-        const String apiUrl =
-            'https://backend-ikpmsidoarjo.vercel.app/admin/alumni'; // Ganti URL ini dengan endpoint backend Anda
-        final response = await http.put(
-          Uri.parse('$apiUrl/${widget.stambuk}'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(alumniData),
+        await _alumniController.updateAlumni(widget.stambuk, alumniData);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data alumni berhasil diperbarui!')),
         );
-
-        if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data alumni berhasil diperbarui!')),
-          );
-          Navigator.pop(context);
-        } else {
-          throw Exception('Failed to update data: ${response.body}');
-        }
+        Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -113,7 +96,8 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
         title: const Text('Edit Alumni'),
         backgroundColor: const Color.fromARGB(255, 23, 114, 110),
         iconTheme: const IconThemeData(color: Colors.white),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -122,7 +106,8 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
               padding: const EdgeInsets.all(16.0),
               child: Card(
                 elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Form(
@@ -131,7 +116,10 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
                       children: [
                         Text(
                           'Edit Data Alumni',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -194,9 +182,10 @@ class _EditAlumniPageState extends State<EditAlumniPage> {
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: _submitForm,
+                          onPressed: _updateAlumni,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 23, 114, 110),
+                            backgroundColor:
+                                const Color.fromARGB(255, 23, 114, 110),
                             padding: const EdgeInsets.symmetric(vertical: 14.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
