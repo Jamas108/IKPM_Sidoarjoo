@@ -101,7 +101,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/');
               Navigator.pop(context);
             },
-            child: const Text('Beranda'),
+            child: const Text(
+              'Beranda',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         PopupMenuItem<String>(
@@ -111,7 +114,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/alumni');
               Navigator.pop(context);
             },
-            child: const Text('Alumni'),
+            child: const Text(
+              'Alumni',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         PopupMenuItem<String>(
@@ -121,7 +127,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/kegiatan');
               Navigator.pop(context);
             },
-            child: const Text('Kegiatan'),
+            child: const Text(
+              'Kegiatan',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         PopupMenuItem<String>(
@@ -131,7 +140,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/informasi');
               Navigator.pop(context);
             },
-            child: const Text('Informasi'),
+            child: const Text(
+              'Informasi',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         PopupMenuItem<String>(
@@ -141,7 +153,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/kritik');
               Navigator.pop(context);
             },
-            child: const Text('Kritik & Saran'),
+            child: const Text(
+              'Kritik & Saran',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         PopupMenuItem<String>(
@@ -151,7 +166,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               context.go('/profil');
               Navigator.pop(context);
             },
-            child: const Text('Profil'),
+            child: const Text(
+              'Profil',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ),
         if (authProvider.isLoggedIn)
@@ -166,7 +184,10 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.pop(context);
                 }
               },
-              child: const Text('Logout'),
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           )
         else
@@ -268,7 +289,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           elevation: 3,
         ),
-        icon: const Icon(Icons.logout, size: 20),
+        icon: const Icon(Icons.login, size: 20, color: Colors.white),
         label: const Text(
           'Logout',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),

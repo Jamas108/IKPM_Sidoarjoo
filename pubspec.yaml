@@ -49,6 +49,8 @@ dependencies:
   universal_io: ^2.0.4
   universal_html: ^2.0.4
   url_launcher: ^6.1.7
+  flutter_launcher_icons: ^0.13.1
+  fl_chart: ^0.64.0
 
 
 
@@ -87,10 +89,19 @@ flutter:
     - assets/kopsuratikpm.jpg
     - assets/bannerriwayatsaran.png
 
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/ikpmlogoonly.png"
+  adaptive_icon_background: "#ffffff"  # Warna latar belakang untuk adaptive icon (opsional)
+  adaptive_icon_foreground: "assets/ikpmlogoonly.png"  # Untuk Android adaptive icon
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

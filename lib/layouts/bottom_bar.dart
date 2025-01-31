@@ -15,7 +15,7 @@ class BottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> routes = [
       '/', // Route untuk Home
-      '/event', // Route untuk Event
+      '/kegiatan', // Route untuk Event
       '/alumni', // Route untuk Alumni
       '/informasi', // Route untuk Informasi
       '/profil', // Route untuk Profile

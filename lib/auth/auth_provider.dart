@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthProvider extends ChangeNotifier {
   // Status login dan data pengguna
   bool _isLoggedIn = false;
+  bool _isSessionLoaded = false;
   String? _userStambuk;
   String? _userNama;
   String? _userTahun;
@@ -24,6 +25,7 @@ class AuthProvider extends ChangeNotifier {
 
   // Getters
   bool get isLoggedIn => _isLoggedIn;
+  bool get isSessionLoaded => _isSessionLoaded;
   String? get userStambuk => _userStambuk;
   String? get userNama => _userNama;
   String? get userTahun => _userTahun;
@@ -142,7 +144,8 @@ class AuthProvider extends ChangeNotifier {
 
     // Muat data hidden fields
     _hiddenFields = prefs.getStringList('hiddenFields_$_userStambuk') ?? [];
-
+    
+    _isSessionLoaded = true;
     notifyListeners();
   }
 

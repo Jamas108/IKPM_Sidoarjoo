@@ -39,8 +39,8 @@ class AlumniPageContent extends StatelessWidget {
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Banner
                   if (kIsWeb)
                     SizedBox(
                       width: double.infinity,
@@ -51,10 +51,10 @@ class AlumniPageContent extends StatelessWidget {
                       ),
                     ),
                   const SizedBox(height: 16),
-                  // Ganti padding di elemen-elemen yang memerlukan jarak lebih jauh
+
+                  // Input Pencarian
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0), // Lebih besar dari sebelumnya (16.0)
+                    padding: const EdgeInsets.all(16.0),
                     child: TextField(
                       controller: alumniController.searchController,
                       decoration: InputDecoration(
@@ -69,10 +69,9 @@ class AlumniPageContent extends StatelessWidget {
                     ),
                   ),
 
-// Bagian Filter
+                  // Filter Dropdown
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -150,33 +149,34 @@ class AlumniPageContent extends StatelessWidget {
                     ),
                   ),
 
-// Bagian Tabel Data
+                  // **Daftar Alumni**
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0), // Lebih besar dari sebelumnya
-                    child: PaginatedDataTable(
-                      header: const Text('Data Alumni'),
-                      columns: const [
-                        DataColumn(label: Text('No')),
-                        DataColumn(label: Text('Stambuk')),
-                        DataColumn(label: Text('Nama')),
-                        DataColumn(label: Text('Kampus Asal')),
-                        DataColumn(label: Text('Kecamatan')),
-                        DataColumn(label: Text('Action')),
-                      ],
-                      source: _AlumniDataSource(
-                        alumniController.filteredAlumniData,
-                        context,
-                      ),
-                      rowsPerPage: alumniController.rowsPerPage,
-                      availableRowsPerPage: const [5, 10, 15],
-                      onRowsPerPageChanged: (value) {
-                        alumniController.setRowsPerPage(value ?? 5);
-                      },
-                      showCheckboxColumn: false,
-                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: alumniController.filteredAlumniData.isEmpty
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.4, // Biar tidak terlalu ke atas
+                            child: const Center(
+                              child: Text(
+                                "Data alumni tidak ditemukan.",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(), // Agar tidak ada scroll dalam list
+                            itemCount: alumniController.filteredAlumniData.length,
+                            itemBuilder: (context, index) {
+                              final alumni = alumniController.filteredAlumniData[index];
+                              return alumni != null ? _buildAlumniListCard(alumni, context) : const SizedBox();
+                            },
+                          ),
                   ),
-                  const SizedBox(height: 16),
+
                   // Footer
                   Container(
                     width: double.infinity,
@@ -200,43 +200,47 @@ class AlumniPageContent extends StatelessWidget {
             ),
     );
   }
-}
 
-class _AlumniDataSource extends DataTableSource {
-  final List<dynamic> alumniData;
-  final BuildContext context;
+  Widget _buildAlumniListCard(Map<String, dynamic>? alumni, BuildContext context) {
+    if (alumni == null) {
+      return const SizedBox();
+    }
 
-  _AlumniDataSource(this.alumniData, this.context);
+    final String nama = alumni['nama_alumni'] ?? "Tidak Ada Nama";
+    final String stambuk = alumni['stambuk']?.toString() ?? "Tidak Ada Stambuk";
+    final String kampus = alumni['kampus_asal'] ?? "Tidak Ada Kampus";
+    final String kecamatan = alumni['kecamatan'] ?? "Tidak Ada Kecamatan";
 
-  @override
-  DataRow? getRow(int index) {
-    if (index >= alumniData.length) return null;
-
-    final alumni = alumniData[index];
-    return DataRow(cells: [
-      DataCell(Text((index + 1).toString())),
-      DataCell(Text(alumni['stambuk'])),
-      DataCell(Text(alumni['nama_alumni'])),
-      DataCell(Text(alumni['kampus_asal'])),
-      DataCell(Text(alumni['kecamatan'])),
-      DataCell(
-        IconButton(
-          icon: const Icon(Icons.info),
-          tooltip: 'Lihat Detail',
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.teal,
+          radius: 25,
+          child: Text(
+            nama.isNotEmpty ? nama[0] : "?",
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: Text(
+          nama,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          kampus,
+          style: const TextStyle(color: Colors.teal, fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.arrow_forward_ios, color: Colors.teal),
           onPressed: () {
-            GoRouter.of(context).go('/alumni/${alumni['stambuk']}');
+            if (alumni['stambuk'] != null) {
+              GoRouter.of(context).go('/alumni/${alumni['stambuk']}');
+            }
           },
         ),
       ),
-    ]);
+    );
   }
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => alumniData.length;
-
-  @override
-  int get selectedRowCount => 0;
 }

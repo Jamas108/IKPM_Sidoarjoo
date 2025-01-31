@@ -3,8 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:ikpm_sidoarjo/models/alumni_model.dart';
 
 class AlumniController {
-  
   final String baseUrl = 'https://backend-ikpmsidoarjo.vercel.app';
+
+  // **Daftar Kampus Manual untuk Filter**
+ 
 
   // Fetch all alumni
   Future<List<AlumniModel>> fetchAlumni() async {
@@ -23,6 +25,7 @@ class AlumniController {
   }
 
   // AlumniController.dart
+ // **Search & Filter Alumni Data**
   Future<List<AlumniModel>> searchAlumni({
     String? searchQuery,
     String? selectedYear,
@@ -33,26 +36,68 @@ class AlumniController {
       final alumni = await fetchAlumni();
 
       return alumni.where((alumni) {
-        final matchesYear =
-            selectedYear == null || alumni.tahun == selectedYear;
-        final matchesCampus =
-            selectedCampus == null || alumni.kampusAsal == selectedCampus;
-        final matchesKecamatan =
-            selectedKecamatan == null || alumni.kecamatan == selectedKecamatan;
-        final matchesSearch = alumni.namaAlumni
-                ?.toLowerCase()
-                .contains(searchQuery?.toLowerCase() ?? '') ??
-            false;
+        final nama = alumni.namaAlumni?.toLowerCase() ?? '';
+        final stambuk = alumni.stambuk?.toLowerCase() ?? '';
+        final kampus = alumni.kampusAsal?.toLowerCase() ?? '';
+        final kecamatan = alumni.kecamatan?.toLowerCase() ?? '';
+        final tahun = alumni.tahun?.toLowerCase() ?? '';
 
-        return matchesYear &&
-            matchesCampus &&
-            matchesKecamatan &&
-            matchesSearch;
+        // **Pencarian Fleksibel**
+        final matchesSearch = searchQuery == null || searchQuery.isEmpty ||
+            nama.contains(searchQuery.toLowerCase()) ||
+            stambuk.contains(searchQuery.toLowerCase()) ||
+            kampus.contains(searchQuery.toLowerCase()) ||
+            kecamatan.contains(searchQuery.toLowerCase());
+
+        // **Filter Tahun (Harus Sama Persis)**
+        final matchesYear = selectedYear == null || tahun == selectedYear.toLowerCase();
+
+        // **Pencocokan Sebagian untuk Filter Kampus**
+        final matchesCampus = selectedCampus == null || kampus.contains(selectedCampus.toLowerCase());
+
+        // **Pencocokan Sebagian untuk Filter Kecamatan**
+        final matchesKecamatan = selectedKecamatan == null || kecamatan.contains(selectedKecamatan.toLowerCase());
+
+        return matchesSearch && matchesYear && matchesCampus && matchesKecamatan;
       }).toList();
     } catch (e) {
       throw Exception('Error searching alumni: $e');
     }
   }
+
+  // **Getter untuk Filter Tahun**
+  List<String> getSortedYearList(List<AlumniModel> alumniList) {
+    return alumniList
+        .map((e) => e.tahun ?? '')
+        .where((tahun) => tahun.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.compareTo(b));
+  }
+
+  // **Getter untuk Filter Kampus (Gunakan Daftar Manual)**
+  List<String> getSortedPondokList() {
+    return [
+      'PMDG Putra Kampus 1', 'PMDG Putra Kampus 2', 'PMDG Putra Kampus 3', 
+      'PMDG Putra Kampus 4', 'PMDG Putra Kampus 5', 'PMDG Putra Kampus 6', 
+      'PMDG Putra Kampus 7', 'PMDG Putra Kampus 8', 'PMDG Putra Kampus 9', 
+      'PMDG Putra Kampus 10', 'PMDG Putra Kampus 11', 'PMDG Putra Kampus 12', 
+      'PMDG Putri Kampus 1', 'PMDG Putri Kampus 2', 'PMDG Putri Kampus 3', 
+      'PMDG Putri Kampus 4', 'PMDG Putri Kampus 5', 'PMDG Putri Kampus 6', 
+      'PMDG Putri Kampus 7', 'PMDG Putri Kampus 8'
+    ];
+  }
+
+  // **Getter untuk Filter Kecamatan**
+  List<String> getSortedKecamatanList(List<AlumniModel> alumniList) {
+    return alumniList
+        .map((e) => e.kecamatan ?? '')
+        .where((kecamatan) => kecamatan.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.compareTo(b));
+  }
+
 
   // Fetch alumni detail by stambuk
   Future<AlumniModel> fetchAlumniDetail(String stambuk) async {
@@ -191,7 +236,4 @@ class AlumniController {
       throw Exception('Error updating hidden fields: $e');
     }
   }
-
-  
-  
 }

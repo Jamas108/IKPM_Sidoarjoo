@@ -6,7 +6,7 @@ class AlumniController with ChangeNotifier {
   List<dynamic> alumniData = []; // Data asli alumni
   List<dynamic> filteredAlumniData = []; // Data alumni setelah difilter
   bool isLoading = true;
-  String? selectedTahun; // Status loading
+  String? selectedTahun; // Filter berdasarkan tahun
   String? selectedPondok; // Filter berdasarkan asal pondok
   String? selectedKecamatan; // Filter berdasarkan kecamatan
   TextEditingController searchController = TextEditingController();
@@ -19,11 +19,21 @@ class AlumniController with ChangeNotifier {
   List<String> hiddenFields = [];
   bool isDetailLoading = false;
 
-  // Fungsi untuk mengambil data alumni
+  // **Daftar Kampus Manual untuk Filter**
+  final List<String> manualPondokList = [
+    'PMDG Putra Kampus 1', 'PMDG Putra Kampus 2', 'PMDG Putra Kampus 3', 
+    'PMDG Putra Kampus 4', 'PMDG Putra Kampus 5', 'PMDG Putra Kampus 6', 
+    'PMDG Putra Kampus 7', 'PMDG Putra Kampus 8', 'PMDG Putra Kampus 9', 
+    'PMDG Putra Kampus 10', 'PMDG Putra Kampus 11', 'PMDG Putra Kampus 12', 
+    'PMDG Putri Kampus 1', 'PMDG Putri Kampus 2', 'PMDG Putri Kampus 3', 
+    'PMDG Putri Kampus 4', 'PMDG Putri Kampus 5', 'PMDG Putri Kampus 6', 
+    'PMDG Putri Kampus 7', 'PMDG Putri Kampus 8'
+  ];
+
+  // **Fetch Data Alumni dari API**
   Future<void> fetchAlumniData() async {
     try {
-      final response = await http
-          .get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni'));
+      final response = await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni'));
       if (response.statusCode == 200) {
         alumniData = json.decode(response.body);
         filteredAlumniData = alumniData; // Awalnya tampilkan semua data
@@ -38,7 +48,7 @@ class AlumniController with ChangeNotifier {
     }
   }
 
-  // Fungsi untuk memfilter data berdasarkan input pencarian
+  // **Filter Alumni Data**
   void filterAlumniData() {
     final searchQuery = searchController.text.toLowerCase();
 
@@ -49,19 +59,20 @@ class AlumniController with ChangeNotifier {
       final kecamatan = alumni['kecamatan']?.toLowerCase() ?? '';
       final tahun = alumni['tahun']?.toLowerCase() ?? '';
 
-      // Cek apakah query pencarian sesuai dengan atribut apa pun
-      final matchesSearch = nama.contains(searchQuery) ||
-          stambuk.contains(searchQuery) ||
-          kampus.contains(searchQuery) ||
-          kecamatan.contains(searchQuery);
+      // **Pencocokan Sebagian untuk Filter Kampus**
+      final matchesPondok = selectedPondok == null || kampus.contains(selectedPondok!.toLowerCase());
 
-      // Cek filter tahun, pondok, dan kecamatan
-      final matchesTahun =
-          selectedTahun == null || alumni['tahun'] == selectedTahun;
-      final matchesPondok =
-          selectedPondok == null || alumni['kampus_asal'] == selectedPondok;
-      final matchesKecamatan =
-          selectedKecamatan == null || alumni['kecamatan'] == selectedKecamatan;
+      // **Pencocokan Sebagian untuk Filter Kecamatan**
+      final matchesKecamatan = selectedKecamatan == null || kecamatan.contains(selectedKecamatan!.toLowerCase());
+
+      // **Pencarian Fleksibel**
+      final matchesSearch = nama.contains(searchQuery) || 
+                            stambuk.contains(searchQuery) || 
+                            kampus.contains(searchQuery) || 
+                            kecamatan.contains(searchQuery);
+
+      // **Filter Tahun (Harus Sama Persis)**
+      final matchesTahun = selectedTahun == null || alumni['tahun'] == selectedTahun;
 
       return matchesSearch && matchesTahun && matchesPondok && matchesKecamatan;
     }).toList();
@@ -69,6 +80,7 @@ class AlumniController with ChangeNotifier {
     notifyListeners();
   }
 
+  // **Reset Semua Filter**
   void resetFilters() {
     selectedTahun = null;
     selectedPondok = null;
@@ -78,7 +90,7 @@ class AlumniController with ChangeNotifier {
     notifyListeners();
   }
 
-  // Fungsi untuk mengubah filter pondok
+  // **Set Filter dan Trigger Penyaringan**
   void setTahunFilter(String? tahun) {
     selectedTahun = tahun;
     filterAlumniData();
@@ -94,28 +106,23 @@ class AlumniController with ChangeNotifier {
     filterAlumniData();
   }
 
-  // Fungsi untuk mengubah jumlah baris per halaman
+  // **Set Jumlah Baris Per Halaman**
   void setRowsPerPage(int rows) {
     rowsPerPage = rows;
     notifyListeners();
   }
 
-  // Fungsi untuk mengambil detail alumni berdasarkan stambuk
-  // Fungsi untuk mengambil detail alumni berdasarkan stambuk
+  // **Ambil Detail Alumni berdasarkan Stambuk**
   Future<void> fetchDetailAlumni(String stambuk) async {
     try {
       isDetailLoading = true;
       notifyListeners();
 
-      final response = await http.get(
-          Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
+      final response = await http.get(Uri.parse('https://backend-ikpmsidoarjo.vercel.app/alumni/$stambuk'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // Simpan detail alumni
         detailAlumni = data;
-
-        // Ambil hidden fields jika ada
         hiddenFields = List<String>.from(data['hidden_fields'] ?? []);
 
         notifyListeners();
@@ -130,13 +137,14 @@ class AlumniController with ChangeNotifier {
     }
   }
 
+  // **Reset Detail Alumni**
   void resetDetailAlumni() {
     detailAlumni = null;
     isDetailLoading = false;
     notifyListeners();
   }
 
-  // Getter untuk pilihan tahun (diurutkan dari terkecil ke terbesar)
+  // **Getter untuk Filter Tahun**
   List<String> get sortedTahunList {
     return alumniData
         .map((e) => e['tahun']?.toString() ?? '') // Konversi ke String
@@ -146,17 +154,12 @@ class AlumniController with ChangeNotifier {
       ..sort((a, b) => a.compareTo(b)); // Urutkan dari terkecil ke terbesar
   }
 
-// Getter untuk pilihan kampus asal (diurutkan alfabetis)
+  // **Getter untuk Filter Kampus (Gunakan Daftar Manual)**
   List<String> get sortedPondokList {
-    return alumniData
-        .map((e) => e['kampus_asal']?.toString() ?? '')
-        .where((pondok) => pondok.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.compareTo(b)); // Urutkan alfabetis
+    return manualPondokList;
   }
 
-// Getter untuk pilihan kecamatan (diurutkan alfabetis)
+  // **Getter untuk Filter Kecamatan**
   List<String> get sortedKecamatanList {
     return alumniData
         .map((e) => e['kecamatan']?.toString() ?? '')

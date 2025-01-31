@@ -47,17 +47,21 @@ import 'profil/settings_page.dart';
 // import 'package:ikpm_sidoarjo/profil/edit_password_page.dart' as password;
 // Tambahkan import EventController
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Pastikan Flutter sudah siap
+
+  final authProvider = AuthProvider();
+  await authProvider.loadSession(); // Tunggu sesi sebelum aplikasi dimulai
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()..loadSession()),
+        ChangeNotifierProvider(
+            create: (_) => authProvider), // Pastikan sesi sudah dimuat
         ChangeNotifierProvider(create: (_) => LoginController()),
         ChangeNotifierProvider(create: (_) => KritikController()),
         ChangeNotifierProvider(create: (_) => AlumniController()),
-        Provider(
-            create: (_) =>
-                EventController()), // Tambahkan EventController sebagai provider
+        Provider(create: (_) => EventController()),
       ],
       child: const MyApp(),
     ),

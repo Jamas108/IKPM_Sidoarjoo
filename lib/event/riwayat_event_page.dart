@@ -17,47 +17,80 @@ class RiwayatEventPage extends StatefulWidget {
 class _RiwayatEventPageState extends State<RiwayatEventPage> {
   final EventController _eventController = EventController();
   late Future<List<EventModel>> _futureKegiatans;
+  List<EventModel> _filteredEvents = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    // Ambil userId dari AuthProvider
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.userStambuk;
 
-    // Pastikan userId tidak null
     if (userId != null) {
       _futureKegiatans = _eventController.fetchRiwayatKegiatan(userId);
+      _futureKegiatans.then((data) {
+        setState(() {
+          _filteredEvents = data;
+        });
+      });
     } else {
       _futureKegiatans = Future.error('User ID tidak ditemukan');
     }
   }
 
+  void _searchEvent(String query) {
+    setState(() {
+      _filteredEvents = _eventController.filterKegiatan(query);
+    });
+  }
+
+  Future<void> _deleteEvent(String eventId) async {
+    bool confirmDelete = await _showDeleteConfirmationDialog();
+    if (confirmDelete) {
+      await _eventController.deleteEvent(eventId);
+      setState(() {
+        _filteredEvents.removeWhere((event) => event.id == eventId);
+      });
+    }
+  }
+
+  Future<bool> _showDeleteConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Konfirmasi Hapus"),
+            content: const Text("Apakah Anda yakin ingin menghapus kegiatan ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bool isWeb = kIsWeb; // Deteksi platform Web atau Mobile
+    final bool isWeb = kIsWeb;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       appBar: isWeb
-          ? const Navbar() // AppBar untuk Web
+          ? const Navbar()
           : AppBar(
               title: const Text(
                 'Riwayat Kegiatan',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
-                  fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
-                  letterSpacing: 1.2, // Memberikan spasi antar huruf
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 20),
               ),
               backgroundColor: const Color.fromARGB(255, 23, 114, 110),
               iconTheme: const IconThemeData(color: Colors.white),
               elevation: 0,
-              automaticallyImplyLeading: true,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
@@ -81,12 +114,10 @@ class _RiwayatEventPageState extends State<RiwayatEventPage> {
             );
           }
 
-          final events = snapshot.data!;
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tampilkan banner hanya di platform Web
                 if (isWeb)
                   SizedBox(
                     width: double.infinity,
@@ -96,58 +127,73 @@ class _RiwayatEventPageState extends State<RiwayatEventPage> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                const SizedBox(height: 16), // Jarak antara banner dan konten
+                const SizedBox(height: 16),
+
+                // Input Pencarian
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: 'Cari Kegiatan',
+                      hintText: 'Masukkan nama kegiatan...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onChanged: _searchEvent,
+                  ),
+                ),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        shrinkWrap:
-                            true, // Pastikan ListView tidak memenuhi layar
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: events.length,
-                        itemBuilder: (context, index) {
-                          final event = events[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            child: ListTile(
-                              leading: event.poster.isNotEmpty
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        event.poster,
-                                        fit: BoxFit.cover,
-                                        width: 50,
-                                        height: 50,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Icon(Icons.broken_image,
-                                              size: 50, color: Colors.grey);
-                                        },
-                                      ),
-                                    )
-                                  : const Icon(Icons.event),
-                              title: Text(event.name),
-                              subtitle: Text(
-                                'Tanggal: ${event.date}, Jam: ${event.time}\nLokasi: ${event.location}',
+                  child: _filteredEvents.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "Tidak ada kegiatan yang sesuai.",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _filteredEvents.length,
+                          itemBuilder: (context, index) {
+                            final event = _filteredEvents[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: ListTile(
+                                leading: event.poster.isNotEmpty
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          event.poster,
+                                          fit: BoxFit.cover,
+                                          width: 50,
+                                          height: 50,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return const Icon(Icons.broken_image,
+                                                size: 50, color: Colors.grey);
+                                          },
+                                        ),
+                                      )
+                                    : const Icon(Icons.event),
+                                title: Text(event.name),
+                                subtitle: Text(
+                                  'Tanggal: ${event.date}, Jam: ${event.time}\nLokasi: ${event.location}',
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteEvent(event.id),
+                                ),
                               ),
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text('Klik pada ${event.name}')),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                            );
+                          },
+                        ),
                 ),
-                // Footer hanya ditampilkan di platform Web
+
                 if (isWeb) const SizedBox(height: 16),
                 if (isWeb)
                   Container(

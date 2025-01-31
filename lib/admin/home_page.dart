@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ikpm_sidoarjo/admin/layouts/sidebar.dart';
 import 'package:ikpm_sidoarjo/controllers/admin/dashboard_controller.dart';
+import 'package:fl_chart/fl_chart.dart'; // Import Chart Library
 
 class HomePageAdmin extends StatefulWidget {
   const HomePageAdmin({Key? key}) : super(key: key);
@@ -15,7 +16,6 @@ class _HomePageAdminState extends State<HomePageAdmin> {
   @override
   void initState() {
     super.initState();
-    // Inisialisasi pemanggilan data dari controller
     _dashboardData = DashboardController().getDashboardData();
   }
 
@@ -38,65 +38,79 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     final data = snapshot.data!;
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Mengatur jumlah kolom berdasarkan ukuran layar
-                        int crossAxisCount = 4;
-                        if (constraints.maxWidth < 600) {
-                          crossAxisCount = 2; // 2 kolom untuk layar lebih kecil
-                        }
-                        if (constraints.maxWidth < 400) {
-                          crossAxisCount =
-                              1; // 1 kolom untuk layar sangat kecil
-                        }
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 20.0,
-                            mainAxisSpacing: 20.0,
-                            childAspectRatio:
-                                1.7, // Mengubah rasio untuk mencegah overflow
-                          ),
-                          itemCount: 4,
-                          itemBuilder: (context, index) {
-                            switch (index) {
-                              case 0:
-                                return CardWidget(
-                                  icon: Icons.person,
-                                  count: data['alumni']!,
-                                  label: 'Jumlah Alumni',
-                                  color: Colors.orange,
-                                );
-                              case 1:
-                                return CardWidget(
-                                  icon: Icons.timer,
-                                  count: data['kegiatan']!.toDouble(),
-                                  label: 'Jumlah Kegiatan',
-                                  color: Colors.blue,
-                                );
-                              case 2:
-                                return CardWidget(
-                                  icon: Icons.book,
-                                  count: data['informasi']!,
-                                  label: 'Jumlah Informasi',
-                                  color: Colors.teal,
-                                );
-                              case 3:
-                                return CardWidget(
-                                  icon: Icons.comment,
-                                  count: data['kritik']!,
-                                  label: 'Jumlah Kritik dan Saran',
-                                  color: Colors.pink,
-                                );
-                              default:
-                                return Container();
+                    return Column(
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            int crossAxisCount = 4;
+                            if (constraints.maxWidth < 600) {
+                              crossAxisCount = 2;
                             }
+                            if (constraints.maxWidth < 400) {
+                              crossAxisCount = 1;
+                            }
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 20.0,
+                                mainAxisSpacing: 20.0,
+                                childAspectRatio: 1.7,
+                              ),
+                              itemCount: 4,
+                              itemBuilder: (context, index) {
+                                switch (index) {
+                                  case 0:
+                                    return CardWidget(
+                                      icon: Icons.person,
+                                      count: data['alumni']!,
+                                      label: 'Jumlah Alumni',
+                                      color: Colors.orange,
+                                    );
+                                  case 1:
+                                    return CardWidget(
+                                      icon: Icons.timer,
+                                      count: data['kegiatan']!,
+                                      label: 'Jumlah Kegiatan',
+                                      color: Colors.blue,
+                                    );
+                                  case 2:
+                                    return CardWidget(
+                                      icon: Icons.book,
+                                      count: data['informasi']!,
+                                      label: 'Jumlah Informasi',
+                                      color: Colors.teal,
+                                    );
+                                  case 3:
+                                    return CardWidget(
+                                      icon: Icons.comment,
+                                      count: data['kritik']!,
+                                      label: 'Jumlah Kritik dan Saran',
+                                      color: Colors.pink,
+                                    );
+                                  default:
+                                    return Container();
+                                }
+                              },
+                            );
                           },
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 20),
+                        Divider(color: Colors.grey[300]),
+                        const SizedBox(height: 10),
+
+                        // **Bagian Chart**
+                        Text(
+                          "Visualisasi Data",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 300,
+                          child: _buildBarChart(data),
+                        ),
+                      ],
                     );
                   } else {
                     return const Center(child: Text('No Data Available'));
@@ -104,53 +118,63 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                 },
               ),
               const SizedBox(height: 20),
-              Divider(color: Colors.grey[300]), // Divider untuk pemisah
-              const SizedBox(height: 10),
-              // Deskripsi Tugas Admin dalam card full width
-              Container(
-                width: double.infinity, // Memastikan lebar card penuh
-                child: Card(
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Deskripsi Tugas Admin',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                            '1. Admin dapat menambahkan, mengedit, melihat detail beserta menghapus data kegiatan.'),
-                        SizedBox(height: 8),
-                        Text(
-                            '2. Admin dapat menambahkan, mengedit, melihat detail beserta menghapus data Informasi.'),
-                        SizedBox(height: 8),
-                        Text(
-                            '3. Admin dapat menambahkan, mengedit, melihat detail, menghapus serta mengganti password akun alumni.'),
-                        SizedBox(height: 8),
-                        Text(
-                            '4. Admin dapat melihat, menghapus dan menunduh format PDF peserta kegiatan.'),
-                        SizedBox(height: 8),
-                        Text(
-                            '5. Admin dapat menambahkan komentar, mengedit komentar yang dimiliki, serta menghapus seluruh komentar pengguna yang di inginkan.'),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildBarChart(Map<String, int> data) {
+    return BarChart(
+      BarChartData(
+        barGroups: [
+          BarChartGroupData(
+            x: 0,
+            barRods: [BarChartRodData(toY: data['alumni']!.toDouble(), color: Colors.orange)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 1,
+            barRods: [BarChartRodData(toY: data['kegiatan']!.toDouble(), color: Colors.blue)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 2,
+            barRods: [BarChartRodData(toY: data['informasi']!.toDouble(), color: Colors.teal)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 3,
+            barRods: [BarChartRodData(toY: data['kritik']!.toDouble(), color: Colors.pink)],
+            showingTooltipIndicators: [0],
+          ),
+        ],
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                switch (value.toInt()) {
+                  case 0:
+                    return const Text('Alumni', style: TextStyle(fontSize: 12));
+                  case 1:
+                    return const Text('Kegiatan', style: TextStyle(fontSize: 12));
+                  case 2:
+                    return const Text('Informasi', style: TextStyle(fontSize: 12));
+                  case 3:
+                    return const Text('Kritik', style: TextStyle(fontSize: 12));
+                  default:
+                    return const Text('');
+                }
+              },
+            ),
+          ),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        ),
+        borderData: FlBorderData(show: false),
+        gridData: FlGridData(show: false),
       ),
     );
   }
@@ -173,38 +197,23 @@ class CardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 8, // Bayangan lebih besar
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12)), // Sudut lebih melengkung
-      color: Colors.white, // Card berwarna putih
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.white,
       child: Container(
-        padding: const EdgeInsets.all(20.0), // Padding lebih besar
+        padding: const EdgeInsets.all(20.0),
         alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 50, // Ukuran ikon lebih besar
-              color: color,
-            ),
+            Icon(icon, size: 50, color: color),
             const SizedBox(height: 8),
             Text(
-              '$count', // Tanpa simbol "$"
-              style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+              '$count',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 8),
-            Text(
-              label,
-              style:
-                  TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.6)),
-            ),
+            Text(label, style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.6))),
           ],
         ),
       ),
