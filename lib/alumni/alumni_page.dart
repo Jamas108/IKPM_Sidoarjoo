@@ -154,7 +154,8 @@ class AlumniPageContent extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: alumniController.filteredAlumniData.isEmpty
                         ? SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.4, // Biar tidak terlalu ke atas
+                            height: MediaQuery.of(context).size.height *
+                                0.4, // Biar tidak terlalu ke atas
                             child: const Center(
                               child: Text(
                                 "Data alumni tidak ditemukan.",
@@ -168,11 +169,16 @@ class AlumniPageContent extends StatelessWidget {
                           )
                         : ListView.builder(
                             shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(), // Agar tidak ada scroll dalam list
-                            itemCount: alumniController.filteredAlumniData.length,
+                            physics:
+                                const NeverScrollableScrollPhysics(), // Agar tidak ada scroll dalam list
+                            itemCount:
+                                alumniController.filteredAlumniData.length,
                             itemBuilder: (context, index) {
-                              final alumni = alumniController.filteredAlumniData[index];
-                              return alumni != null ? _buildAlumniListCard(alumni, context) : const SizedBox();
+                              final alumni =
+                                  alumniController.filteredAlumniData[index];
+                              return alumni != null
+                                  ? _buildAlumniListCard(alumni, context)
+                                  : const SizedBox();
                             },
                           ),
                   ),
@@ -201,7 +207,8 @@ class AlumniPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildAlumniListCard(Map<String, dynamic>? alumni, BuildContext context) {
+  Widget _buildAlumniListCard(
+      Map<String, dynamic>? alumni, BuildContext context) {
     if (alumni == null) {
       return const SizedBox();
     }
@@ -221,7 +228,8 @@ class AlumniPageContent extends StatelessWidget {
           radius: 25,
           child: Text(
             nama.isNotEmpty ? nama[0] : "?",
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         title: Text(
@@ -230,7 +238,8 @@ class AlumniPageContent extends StatelessWidget {
         ),
         subtitle: Text(
           kampus,
-          style: const TextStyle(color: Colors.teal, fontSize: 14, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Colors.teal, fontSize: 14, fontWeight: FontWeight.bold),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.arrow_forward_ios, color: Colors.teal),

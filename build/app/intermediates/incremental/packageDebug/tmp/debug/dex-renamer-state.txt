@@ -1,4 +1,4 @@
-#Fri Jan 31 10:57:45 WIB 2025
+#Mon Feb 03 01:21:14 WIB 2025
 base.0=/Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/build/app/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/build/app/intermediates/dex/debug/mergeLibDexDebug/0/classes.dex
 base.2=/Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/build/app/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex

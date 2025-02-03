@@ -16,12 +16,15 @@ class RiwayatKritikPage extends StatefulWidget {
 
 class _RiwayatKritikPageState extends State<RiwayatKritikPage> {
   List<Map<String, dynamic>> _kritikList = [];
+  List<Map<String, dynamic>> _filteredKritikList = [];
   bool _isLoading = true;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadKritik();
+    _searchController.addListener(_searchKritiks);
   }
 
   Future<void> _loadKritik() async {
@@ -29,6 +32,7 @@ class _RiwayatKritikPageState extends State<RiwayatKritikPage> {
       final kritik = await ProfilController().fetchKritikByStambuk(context);
       setState(() {
         _kritikList = kritik;
+        _filteredKritikList = kritik; // Initially, display all kritiks
         _isLoading = false;
       });
     } catch (error) {
@@ -36,6 +40,15 @@ class _RiwayatKritikPageState extends State<RiwayatKritikPage> {
         _isLoading = false;
       });
     }
+  }
+
+  void _searchKritiks() {
+    setState(() {
+      _filteredKritikList = ProfilController().searchKritik(
+        _kritikList,
+        _searchController.text,
+      );
+    });
   }
 
   @override
@@ -71,10 +84,22 @@ class _RiwayatKritikPageState extends State<RiwayatKritikPage> {
                 fit: BoxFit.cover,
               ),
             ),
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: 'Cari Kritik',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _kritikList.isEmpty
+                : _filteredKritikList.isEmpty
                     ? const Center(
                         child: Text(
                           'Belum ada kritik dan saran',
@@ -86,7 +111,7 @@ class _RiwayatKritikPageState extends State<RiwayatKritikPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 16.0),
                           child: Column(
-                            children: _kritikList.map((kritik) {
+                            children: _filteredKritikList.map((kritik) {
                               return Card(
                                 elevation: 4,
                                 margin:

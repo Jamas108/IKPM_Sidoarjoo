@@ -57,7 +57,8 @@ class DetailAlumniPage extends StatelessWidget {
                 }
 
                 if (alumniController.detailAlumni == null) {
-                  return const Center(child: Text('Data detail tidak ditemukan'));
+                  return const Center(
+                      child: Text('Data detail tidak ditemukan'));
                 }
 
                 final hiddenFields = alumniController.hiddenFields;
@@ -172,7 +173,8 @@ class DetailAlumniPage extends StatelessWidget {
           ),
           Consumer<AlumniController>(
             builder: (context, alumniController, child) {
-              if (alumniController.detailAlumni == null) return const SizedBox();
+              if (alumniController.detailAlumni == null)
+                return const SizedBox();
 
               final detail = alumniController.detailAlumni!;
               final namaAlumni = detail['nama_alumni'] ?? '-';
@@ -191,7 +193,8 @@ class DetailAlumniPage extends StatelessWidget {
                           'https://wa.me/$waNumber?text=${Uri.encodeComponent(message)}';
                       launchWhatsApp(waUrl);
                     },
-                    icon: const Icon(Icons.call_end_outlined, color: Colors.white),
+                    icon: const Icon(Icons.call_end_outlined,
+                        color: Colors.white),
                     label: const Text(
                       'Minta Data Detail',
                       style: TextStyle(fontSize: 16, color: Colors.white),
@@ -225,13 +228,18 @@ class DetailAlumniPage extends StatelessWidget {
     );
   }
 
+  // Updated method to launch WhatsApp
   void launchWhatsApp(String url) async {
     final Uri uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      // Handle any errors that occur during the launch process
+      print("Error launching WhatsApp: $e");
     }
   }
 

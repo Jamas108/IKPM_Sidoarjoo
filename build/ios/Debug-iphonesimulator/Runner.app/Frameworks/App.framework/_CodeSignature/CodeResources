@@ -10,11 +10,11 @@
 		</data>
 		<key>flutter_assets/AssetManifest.bin</key>
 		<data>
-		LS8w/H23z9RYXTHedNHa9FKCziA=
+		P4+1BbtkWxKRLlkPfKSgL91DAa0=
 		</data>
 		<key>flutter_assets/AssetManifest.json</key>
 		<data>
-		A45hivvSuDzF9RkOoERUGk+jCBQ=
+		MaDHrtYyV6e/8pJ/aHl5rG84pWs=
 		</data>
 		<key>flutter_assets/FontManifest.json</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>flutter_assets/NOTICES.Z</key>
 		<data>
-		S+ENAyRGMFIWmSgu8RGws3YTCUE=
+		1tV7wMe2KzYvqjMA1MT4WUzbw3k=
 		</data>
 		<key>flutter_assets/assets/banner.png</key>
 		<data>
@@ -43,6 +43,10 @@
 		<key>flutter_assets/assets/bannerriwayat.png</key>
 		<data>
 		bND8fFS3771MOvCmRg+DAWD4atI=
+		</data>
+		<key>flutter_assets/assets/bannerriwayatsaran.png</key>
+		<data>
+		dDg/7+nVMrPZzshxIo47hIM7Q4w=
 		</data>
 		<key>flutter_assets/assets/fonts/Roboto-Bold.ttf</key>
 		<data>
@@ -78,7 +82,7 @@
 		</data>
 		<key>flutter_assets/kernel_blob.bin</key>
 		<data>
-		DobkeM0C8XRpI0sjW3nSad9eIig=
+		brmDyDiKu37yRRp06U39j5sCJfY=
 		</data>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -99,14 +103,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			f6w9uHg/7J5i1n/lBsrVWWJgj7e3IlUyZk9w5e8N3EE=
+			7YIL2pgTO/BuOwUWRANtmQCHoS3Yxz0lzE07ySP4F7A=
 			</data>
 		</dict>
 		<key>flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			KZqcR6A27NcvRY75n5IeFdCv2IuzHoyAjNEu7Se6zHI=
+			ONqy3ZxUiY3Ssgi7S5MBBZaczkAMRAFkMfhWJ8oQACE=
 			</data>
 		</dict>
 		<key>flutter_assets/FontManifest.json</key>
@@ -120,7 +124,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			FWgSJ3Pw2lbH12jGJmgRVwj/EnbOnfxWerBu+Z44Sk0=
+			Y9TXmu8AsxvmDJ0YEPgnCJlhHyeij96bckk+6UCopBw=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/banner.png</key>
@@ -156,6 +160,13 @@
 			<key>hash2</key>
 			<data>
 			KXcBb/28jHeKJXfIS00ImMUorr7VLTrRjGxjtlLaC94=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/bannerriwayatsaran.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			FZ3Zdd9JZ6jwYo7+/mcXHa9VvQE5BV9Rn+WsWsTa8e0=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/fonts/Roboto-Bold.ttf</key>
@@ -218,7 +229,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			SnL19VGrr3kya3oAIUYwkp3N58Os7Z3VyDBWeD3c2fQ=
+			QV7826W+B7/djfdqsvD1O9R84AJPpWPDjwonLHhpe0Q=
 			</data>
 		</dict>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

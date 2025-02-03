@@ -235,4 +235,13 @@ class ProfilController {
       debugPrint('Error deleting kritik: $error');
     }
   }
+
+  List<Map<String, dynamic>> searchKritik(
+      List<Map<String, dynamic>> kritikList, String query) {
+    return kritikList.where((kritik) {
+      final lowerCaseQuery = query.toLowerCase();
+      final kritikText = kritik['kritik']?.toLowerCase() ?? '';
+      return kritikText.contains(lowerCaseQuery);
+    }).toList();
+  }
 }
