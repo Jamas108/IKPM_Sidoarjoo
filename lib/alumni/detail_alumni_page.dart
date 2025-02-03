@@ -22,6 +22,8 @@ class DetailAlumniPage extends StatelessWidget {
       alumniController.fetchDetailAlumni(stambuk);
     });
 
+    final bool isMobile = !kIsWeb && MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       appBar: kIsWeb
           ? const Navbar()
@@ -184,29 +186,31 @@ class DetailAlumniPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final waNumber = '+6281233908357';
-                      final message =
-                          "Assalamualaikum, perkenalkan [nama anda], saya ingin meminta data detail alumni atas nama \"$namaAlumni\" dengan stambuk \"$stambuk\" apakah boleh?";
-                      final waUrl =
-                          'https://wa.me/$waNumber?text=${Uri.encodeComponent(message)}';
-                      launchWhatsApp(waUrl);
-                    },
-                    icon: const Icon(Icons.call_end_outlined,
-                        color: Colors.white),
-                    label: const Text(
-                      'Minta Data Detail',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
+                  child: isMobile
+                      ? null // Don't display the button on mobile
+                      : ElevatedButton.icon(
+                          onPressed: () {
+                            final waNumber = '+6281233908357';
+                            final message =
+                                "Assalamualaikum, perkenalkan [nama anda], saya ingin meminta data detail alumni atas nama \"$namaAlumni\" dengan stambuk \"$stambuk\" apakah boleh?";
+                            final waUrl =
+                                'https://wa.me/$waNumber?text=${Uri.encodeComponent(message)}';
+                            launchWhatsApp(waUrl);
+                          },
+                          icon: const Icon(Icons.call_end_outlined,
+                              color: Colors.white),
+                          label: const Text(
+                            'Minta Data Detail',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
                 ),
               );
             },

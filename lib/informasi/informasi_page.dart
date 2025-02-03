@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // Untuk mendeteksi Web
+import 'package:flutter/foundation.dart'; // Untuk deteksi Web
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../controllers/informasi_controller.dart';
@@ -56,6 +56,7 @@ class _InformasiPageState extends State<InformasiPage> {
   @override
   Widget build(BuildContext context) {
     final bool isWeb = kIsWeb; // Deteksi platform Web atau Android
+    final bool isMobile = !isWeb && (MediaQuery.of(context).size.width < 600); // Menentukan apakah platform mobile
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -67,8 +68,7 @@ class _InformasiPageState extends State<InformasiPage> {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20, // Ukuran font lebih besar
-                  fontWeight:
-                      FontWeight.w600, // Berat font medium untuk kesan elegan
+                  fontWeight: FontWeight.w600, // Berat font medium untuk kesan elegan
                   fontFamily: 'Roboto', // Gunakan font elegan, contoh: Roboto
                   letterSpacing: 1.2, // Memberikan spasi antar huruf
                 ),
@@ -127,8 +127,7 @@ class _InformasiPageState extends State<InformasiPage> {
                         ),
                         // Spacer untuk mendorong footer ke bawah
                         SizedBox(
-                          height: MediaQuery.of(context).size.height *
-                              0.3, // 30% tinggi layar
+                          height: MediaQuery.of(context).size.height * 0.3, // 30% tinggi layar
                         ),
                       ],
                     ),
@@ -147,19 +146,20 @@ class _InformasiPageState extends State<InformasiPage> {
                       ),
                     ),
 
-                  // Footer
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    color: const Color(0xFF2C7566),
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: const Center(
-                      child: Text(
-                        "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ),
-                  ),
+                  // Footer (hanya tampil jika bukan di mobile)
+                  // if (!isMobile)
+                  //   const SizedBox(height: 16),
+                  //   Container(
+                  //     width: double.infinity,
+                  //     color: const Color(0xFF2C7566),
+                  //     padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  //     child: const Center(
+                  //       child: Text(
+                  //         "© 2025 IKPM Sidoarjo. All Rights Reserved.",
+                  //         style: TextStyle(color: Colors.white, fontSize: 14),
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
             ),
@@ -224,8 +224,7 @@ class _InformasiPageState extends State<InformasiPage> {
                   width: double.infinity,
                   child: Image.network(
                     informasi.image,
-                    fit: BoxFit
-                        .contain, // Agar gambar ditampilkan dalam ukuran asli tanpa dipotong
+                    fit: BoxFit.contain, // Agar gambar ditampilkan dalam ukuran asli tanpa dipotong
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
                         child: Text(

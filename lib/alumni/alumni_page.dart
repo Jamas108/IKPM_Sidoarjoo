@@ -77,7 +77,7 @@ class AlumniPageContent extends StatelessWidget {
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Filter Tahun"),
+                            hint: const Text("Tahun"),
                             value: alumniController.selectedTahun,
                             onChanged: (value) {
                               alumniController.setTahunFilter(value);
@@ -94,7 +94,7 @@ class AlumniPageContent extends StatelessWidget {
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Filter Kampus Asal"),
+                            hint: const Text("Kampus Asal"),
                             value: alumniController.selectedPondok,
                             onChanged: (value) {
                               alumniController.setPondokFilter(value);
@@ -111,7 +111,7 @@ class AlumniPageContent extends StatelessWidget {
                         Expanded(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Filter Kecamatan"),
+                            hint: const Text("Kecamatan"),
                             value: alumniController.selectedKecamatan,
                             onChanged: (value) {
                               alumniController.setKecamatanFilter(value);
@@ -184,17 +184,17 @@ class AlumniPageContent extends StatelessWidget {
                   ),
 
                   // Footer
-                  Container(
-                    width: double.infinity,
-                    color: const Color(0xFF2C7566),
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: const Center(
-                      child: Text(
-                        "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   width: double.infinity,
+                  //   color: const Color(0xFF2C7566),
+                  //   padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  //   child: const Center(
+                  //     child: Text(
+                  //       "© 2025 IKPM Sidoarjo. All Rights Reserved.",
+                  //       style: TextStyle(color: Colors.white, fontSize: 14),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

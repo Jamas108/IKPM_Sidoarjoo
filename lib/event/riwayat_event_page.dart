@@ -195,18 +195,18 @@ class _RiwayatEventPageState extends State<RiwayatEventPage> {
                 ),
 
                 if (isWeb) const SizedBox(height: 16),
-                if (isWeb)
-                  Container(
-                    width: double.infinity,
-                    color: const Color(0xFF2C7566),
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: const Center(
-                      child: Text(
-                        "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ),
-                  ),
+                // if (isWeb)
+                //   Container(
+                //     width: double.infinity,
+                //     color: const Color(0xFF2C7566),
+                //     padding: const EdgeInsets.symmetric(vertical: 20.0),
+                //     child: const Center(
+                //       child: Text(
+                //         "© 2025 IKPM Sidoarjo. All Rights Reserved.",
+                //         style: TextStyle(color: Colors.white, fontSize: 14),
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           );

@@ -124,17 +124,17 @@ class KritikPage extends StatelessWidget {
             ),
           ),
           // Footer menempel di bawah halaman
-          Container(
-            width: double.infinity,
-            color: const Color(0xFF2C7566),
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: const Center(
-              child: Text(
-                "© 2025 IKPM Sidoarjo. All Rights Reserved.",
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-            ),
-          ),
+          // Container(
+          //   width: double.infinity,
+          //   color: const Color(0xFF2C7566),
+          //   padding: const EdgeInsets.symmetric(vertical: 20.0),
+          //   child: const Center(
+          //     child: Text(
+          //       "© 2025 IKPM Sidoarjo. All Rights Reserved.",
+          //       style: TextStyle(color: Colors.white, fontSize: 14),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

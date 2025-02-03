@@ -27,8 +27,8 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/ansa
 	android:name
 		INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml
 manifest
-ADDED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:1:1-47:12
-MERGED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:1:1-47:12
+ADDED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:1:1-48:12
+MERGED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:1:1-48:12
 INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/debug/AndroidManifest.xml:1:1-7:12
 INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/debug/AndroidManifest.xml:1:1-7:12
@@ -120,6 +120,10 @@ MERGED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo
 MERGED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:46:5-66
 	android:name
 		ADDED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:46:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:47:5-79
+	android:name
+		ADDED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/main/AndroidManifest.xml:47:22-76
 uses-sdk
 INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/debug/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/ansarnurjamas/Dokumen/KULIAH/TUGAS AKHIR/CODING/ikpm_sidoarjo/android/app/src/debug/AndroidManifest.xml

@@ -98,9 +98,9 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/ikpmlogoonly.png"
+  image_path: "assets/icon2.png"
   adaptive_icon_background: "#ffffff"  # Warna latar belakang untuk adaptive icon (opsional)
-  adaptive_icon_foreground: "assets/ikpmlogoonly.png"  # Untuk Android adaptive icon
+  adaptive_icon_foreground: "assets/icon2.png"  # Untuk Android adaptive icon
 
 
   # To add assets to your application, add an assets section, like this:
